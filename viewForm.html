@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Quản Lý Ticket - CNTT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, sans-serif;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        margin: 0;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: auto;
+      }
+
+      h1 {
+        color: #333;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+      }
+
+      .stat {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        font-weight: bold;
+      }
+
+      select,
+      button {
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+      }
+
+      button {
+        background: #667eea;
+        color: #fff;
+        cursor: pointer;
+        border: none;
+      }
+
+      .ticket {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        background: #f9f9f9;
+      }
+
+      .ticket:hover {
+        border-color: #667eea;
+      }
+
+      /* ===== STATUS BADGE (FIX CHUẨN) ===== */
+      .status {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        color: #fff;
+        display: inline-block;
+      }
+
+      .status-new {
+        background: #f1c40f;
+        color: #333;
+      }
+
+      .status-processing {
+        background: #3498db;
+      }
+
+      .status-done {
+        background: #2ecc71;
+      }
+
+      .status-closed {
+        background: #95a5a6;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.7); /* Màu tối sang trọng hơn */
+        backdrop-filter: blur(4px); /* Làm mờ nền phía sau */
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        transition: all 0.3s ease;
+      }
+
+      .modal.active {
+        display: flex;
+        opacity: 1;
+      }
+
+      .modal-content {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 0; /* Để padding cho header/body riêng */
+        width: 95%;
+        max-width: 650px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+      }
+
+      .modal.active .modal-content {
+        transform: translateY(0);
+      }
+
+      /* Header Modal */
+      .modal-header {
+        background: #f8fafc;
+        padding: 20px 25px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .modal-header h3 {
+        margin: 0;
+        color: #1e293b;
+        font-size: 1.25rem;
+        font-weight: 700;
+      }
+
+      /* Body Modal */
+      .modal-body {
+        padding: 25px;
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Chia 2 cột */
+        gap: 15px;
+      }
+
+      /* Các ô nhập liệu chiếm toàn chiều ngang */
+      .full-width {
+        grid-column: span 2;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .form-group label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #64748b;
+        margin-left: 2px;
+      }
+
+      .modal-body input,
+      .modal-body select,
+      .modal-body textarea {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        font-size: 14px;
+        color: #334155;
+        transition: all 0.2s;
+        box-sizing: border-box;
+      }
+
+      .modal-body input:focus,
+      .modal-body select:focus,
+      .modal-body textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+      }
+
+      .modal-body textarea {
+        height: 80px;
+        resize: vertical;
+      }
+
+      /* Footer Modal */
+      .modal-footer {
+        padding: 15px 25px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      /* Button chuyên nghiệp */
+      .btn {
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-save {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+      }
+
+      .btn-save:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3);
+      }
+
+      .btn-close {
+        background: #e2e8f0;
+        color: #475569;
+      }
+
+      .btn-close:hover {
+        background: #cbd5e1;
+      }
+
+      /* Ẩn input ID nhưng vẫn đẹp */
+      #mMa {
+        background: #f1f5f9;
+        cursor: not-allowed;
+        font-weight: 700;
+        color: #64748b;
+      }
+
+      textarea,
+      input {
+        width: 100%;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="card">
+        <h1>🎫 Quản Lý Ticket - Phòng CNTT</h1>
+        <p>Xem và cập nhật trạng thái các yêu cầu hỗ trợ</p>
+
+        <div class="stats">
+          <div class="stat">Tổng<br /><span id="statTotal">0</span></div>
+          <div class="stat">Mới<br /><span id="statNew">0</span></div>
+          <div class="stat">
+            Đang xử lý<br /><span id="statProcessing">0</span>
+          </div>
+          <div class="stat">Hoàn tất<br /><span id="statDone">0</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <select id="filterStatus" onchange="renderTickets()">
+          <option value="">Tất cả trạng thái</option>
+          <option value="Mới">Mới</option>
+          <option value="Đang xử lý">Đang xử lý</option>
+          <option value="Hoàn tất">Hoàn tất</option>
+          <option value="Đóng">Đóng</option>
+        </select>
+
+        <button onclick="loadTickets()">🔄 Làm mới</button>
+      </div>
+
+      <div class="card" id="tickets"></div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal" id="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>🎫 Cập nhật Ticket</h3>
+          <button
+            onclick="closeModal()"
+            style="
+              background: none;
+              border: none;
+              font-size: 20px;
+              cursor: pointer;
+              color: #94a3b8;
+            "
+          >
+            &times;
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Mã Sự Cố</label>
+            <input id="mMa" disabled />
+          </div>
+          <div class="form-group">
+            <label>Trạng thái xử lý</label>
+            <select id="mStatus">
+              <option value="Mới">🟡 Mới</option>
+              <option value="Đang xử lý">🔵 Đang xử lý</option>
+              <option value="Hoàn tất">🟢 Hoàn tất</option>
+              <option value="Đóng">⚪ Đóng</option>
+            </select>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Nguyên nhân sự cố</label>
+            <textarea
+              id="mNguyenNhan"
+              placeholder="Nhập nguyên nhân tìm thấy..."
+            ></textarea>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Hướng xử lý / Kết quả</label>
+            <textarea
+              id="mXuLy"
+              placeholder="Nội dung đã xử lý cho khách hàng..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Thời gian xử lý (phút)</label>
+            <input id="mTime" type="number" placeholder="Ví dụ: 30" />
+          </div>
+          <div class="form-group">
+            <label>Ghi chú thêm</label>
+            <input id="mNote" type="text" placeholder="Ghi chú nội bộ..." />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-close" onclick="closeModal()">✖ Hủy bỏ</button>
+          <button class="btn btn-save" onclick="save()">💾 Lưu cập nhật</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let tickets = [];
+      let current = null;
+
+      /* ===== MAP TRẠNG THÁI → CLASS ===== */
+      function statusClass(status) {
+        switch (status) {
+          case "Mới":
+            return "status-new";
+          case "Đang xử lý":
+            return "status-processing";
+          case "Hoàn tất":
+            return "status-done";
+          case "Đóng":
+            return "status-closed";
+          default:
+            return "";
+        }
+      }
+
+      function loadTickets() {
+        google.script.run
+          .withSuccessHandler((res) => {
+            if (!res || res.success !== true) {
+              tickets = [];
+            } else {
+              tickets = Array.isArray(res.tickets) ? res.tickets : [];
+            }
+            updateStats();
+            renderTickets();
+          })
+          .withFailureHandler(() => {
+            alert("Backend bị lỗi, xem Execution log");
+          })
+          .getTickets();
+      }
+
+      function updateStats() {
+        statTotal.textContent = tickets.length;
+        statNew.textContent = tickets.filter(
+          (t) => t.trangThai === "Mới",
+        ).length;
+        statProcessing.textContent = tickets.filter(
+          (t) => t.trangThai === "Đang xử lý",
+        ).length;
+        statDone.textContent = tickets.filter(
+          (t) => t.trangThai === "Hoàn tất",
+        ).length;
+      }
+
+      function renderTickets() {
+        const box = document.getElementById("tickets");
+        box.innerHTML = "";
+
+        const status = filterStatus.value;
+        const list = status
+          ? tickets.filter((t) => t.trangThai === status)
+          : tickets;
+
+        if (list.length === 0) {
+          box.innerHTML = "<p>Không có ticket</p>";
+          return;
+        }
+
+        list.forEach((t) => {
+          const div = document.createElement("div");
+          div.className = "ticket";
+          div.innerHTML = `
+            <b>${t.nguoiBaoSuCo}</b><br/>
+            <b>${t.maSuCo}</b> - ${t.loaiSuCo}<br/>
+            ${t.moTaSuCo}<br/>
+            <span class="status ${statusClass(t.trangThai)}">
+              ${t.trangThai}
+            </span>
+          `;
+          div.onclick = () => openModal(t);
+          box.appendChild(div);
+        });
+      }
+
+      function openModal(t) {
+        current = t;
+        modal.classList.add("active");
+        mMa.value = t.maSuCo;
+        mStatus.value = t.trangThai;
+        mNguyenNhan.value = t.nguyenNhan || "";
+        mXuLy.value = t.huongXuLy || "";
+        mTime.value = t.thoiGianXuLy || "";
+        mNote.value = t.ghiChu || "";
+      }
+
+      function closeModal() {
+        modal.classList.remove("active");
+      }
+
+      function save() {
+        if (!current) return;
+
+        google.script.run
+          .withSuccessHandler(() => {
+            closeModal();
+            loadTickets();
+          })
+          .updateTicket({
+            maSuCo: current.maSuCo,
+            trangThai: mStatus.value,
+            nguyenNhan: mNguyenNhan.value,
+            huongXuLy: mXuLy.value,
+            thoiGianXuLy: mTime.value,
+            ghiChu: mNote.value,
+          });
+      }
+
+      window.onload = loadTickets;
+    </script>
+  </body>
+</html>
