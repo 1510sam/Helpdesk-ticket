@@ -30,14 +30,25 @@ function doGet(e) {
     return HtmlService.createHtmlOutputFromFile("form-view").setTitle(
       "Quản lý Ticket CNTT",
     );
+  } else if (page === "create") {
+    return HtmlService.createHtmlOutputFromFile("form-create").setTitle(
+      "Gửi Ticket CNTT",
+    );
+  } else {
+    return HtmlService.createHtmlOutputFromFile("form-create").setTitle(
+      "Gửi Ticket CNTT",
+    );
   }
-  return HtmlService.createHtmlOutputFromFile("form-create").setTitle(
-    "Gửi Ticket CNTT",
-  );
+}
+
+function getWebAppUrl() {
+  return ScriptApp.getService().getUrl();
 }
 
 function processForm(data) {
+  const lock = LockService.getScriptLock();
   try {
+    lock.waitLock(30000);
     const sheet = getSheet();
     const folder = DriveApp.getFolderById(DRIVE_FOLDER_ID);
 
@@ -89,7 +100,7 @@ function processForm(data) {
 
     // 3. Chuẩn bị dòng dữ liệu mới (Cột A bây giờ dùng biến stt vừa tính)
     const newRow = [
-      stt, // Cột A: STT (Đã fix)
+      stt, // Cột A: STT
       maSuCo, // Cột B: Mã sự cố
       new Date(data.ngayPhatSinh), // Cột C: Ngày phát sinh
       data.nguoiBaoSuCo,
@@ -150,6 +161,8 @@ function processForm(data) {
   } catch (err) {
     console.error(err);
     return { success: false, error: err.toString() };
+  } finally {
+    lock.releaseLock();
   }
 }
 
@@ -230,7 +243,7 @@ function updateTicket(data) {
         sheet.getRange(row, 14).setValue(Number(data.thoiGianXuLy || 0));
         sheet.getRange(row, 15).setValue(data.trangThai);
         sheet.getRange(row, 17).setValue(data.ghiChu || "");
-        return { success: true };
+        return { success: true, message: "Cập nhật thành công" };
       }
     }
     return { success: false, message: "Không tìm thấy mã" };

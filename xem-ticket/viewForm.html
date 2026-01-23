@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Quản Lý Ticket - CNTT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="card">
+        <h1>🎫 Quản Lý Ticket - Phòng CNTT</h1>
+        <p>Xem và cập nhật trạng thái các yêu cầu hỗ trợ</p>
+
+        <div class="stats">
+          <div class="stat">Tổng<br /><span id="statTotal">0</span></div>
+          <div class="stat">Mới<br /><span id="statNew">0</span></div>
+          <div class="stat">
+            Đang xử lý<br /><span id="statProcessing">0</span>
+          </div>
+          <div class="stat">Hoàn tất<br /><span id="statDone">0</span></div>
+        </div>
+      </div>
+
+      <div class="card card-header">
+        <div class="filter-group">
+          <select id="filterStatus" onchange="renderTickets()">
+            <option value="">🎯 Tất cả trạng thái</option>
+            <option value="Mới">Mới</option>
+            <option value="Đang xử lý">Đang xử lý</option>
+            <option value="Hoàn tất">Hoàn tất</option>
+            <option value="Đóng">Đóng</option>
+          </select>
+
+          <!-- <input type="date" id="filterDate" onchange="renderTickets()" title="Lọc theo ngày phát sinh" /> -->
+
+          <select id="filterPriority" onchange="renderTickets()">
+            <option value="">⚡ Mức độ ưu tiên</option>
+            <option value="P1 - Khẩn cấp">P1 - Khẩn cấp</option>
+            <option value="P2 - Cao">P2 - Cao</option>
+            <option value="P3 - Thường">P3 - Thường</option>
+          </select>
+
+          <select id="filterType" onchange="renderTickets()">
+            <option value="">📂 Loại sự cố</option>
+            <option value="HIS">HIS</option>
+            <option value="BIS">BIS</option>
+            <option value="RIS">RIS</option>
+            <option value="LIS">LIS</option>
+            <option value="PHIS">PHIS</option>
+          </select>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn-refresh" onclick="loadTickets()">
+            🔄 Làm mới
+          </button>
+          <button class="btn-create" onclick="goToCreate()">
+            ➕ Tạo ticket
+          </button>
+        </div>
+      </div>
+
+      <div class="card" id="tickets"></div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal" id="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>🎫 Cập nhật Ticket</h3>
+          <button
+            onclick="closeModal()"
+            style="
+              background: none;
+              border: none;
+              font-size: 20px;
+              cursor: pointer;
+              color: #94a3b8;
+            "
+          >
+            &times;
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Mã Sự Cố</label>
+            <input id="mMa" disabled />
+          </div>
+          <div class="form-group">
+            <label>Trạng thái xử lý</label>
+            <select id="mStatus">
+              <option value="Mới">🟡 Mới</option>
+              <option value="Đang xử lý">🔵 Đang xử lý</option>
+              <option value="Hoàn tất">🟢 Hoàn tất</option>
+            </select>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Nguyên nhân sự cố</label>
+            <textarea
+              id="mNguyenNhan"
+              placeholder="Nhập nguyên nhân tìm thấy..."
+            ></textarea>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Hướng xử lý / Kết quả</label>
+            <textarea
+              id="mXuLy"
+              placeholder="Nội dung đã xử lý cho khách hàng..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Thời gian xử lý (phút)</label>
+            <input id="mTime" type="number" placeholder="Ví dụ: 30" />
+          </div>
+          <div class="form-group">
+            <label>Ghi chú thêm</label>
+            <input id="mNote" type="text" placeholder="Ghi chú nội bộ..." />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-close" onclick="closeModal()">✖ Hủy bỏ</button>
+          <button class="btn btn-save" onclick="save()">💾 Lưu cập nhật</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let tickets = [];
+      let current = null;
+
+      /* ===== MAP TRẠNG THÁI → CLASS ===== */
+      function statusClass(status) {
+        switch (status) {
+          case "Mới":
+            return "status-new";
+          case "Đang xử lý":
+            return "status-processing";
+          case "Hoàn tất":
+            return "status-done";
+          case "Đóng":
+            return "status-closed";
+          default:
+            return "";
+        }
+      }
+
+      function loadTickets() {
+        google.script.run
+          .withSuccessHandler((res) => {
+            if (!res || res.success !== true) {
+              tickets = [];
+            } else {
+              tickets = Array.isArray(res.tickets) ? res.tickets : [];
+            }
+            updateStats();
+            renderTickets();
+          })
+          .withFailureHandler(() => {
+            alert("Backend bị lỗi, xem Execution log");
+          })
+          .getTickets();
+      }
+
+      function updateStats() {
+        statTotal.textContent = tickets.length;
+        statNew.textContent = tickets.filter(
+          (t) => t.trangThai === "Mới",
+        ).length;
+        statProcessing.textContent = tickets.filter(
+          (t) => t.trangThai === "Đang xử lý",
+        ).length;
+        statDone.textContent = tickets.filter(
+          (t) => t.trangThai === "Hoàn tất",
+        ).length;
+      }
+
+      function renderTickets() {
+        const box = document.getElementById("tickets");
+        if (!box) return;
+        box.innerHTML = "";
+
+        // 1. Lấy giá trị từ các ô lọc
+        const status = document.getElementById("filterStatus").value;
+        //const date = document.getElementById("filterDate").value;
+        const priority = document.getElementById("filterPriority").value;
+        const type = document.getElementById("filterType").value;
+        // 2. Thực hiện lọc đa điều kiện
+        const list = tickets.filter((t) => {
+          // Lọc trạng thái (nếu rỗng thì bỏ qua)
+          const matchStatus = !status || t.trangThai === status;
+
+          // Lọc mức độ ưu tiên
+          const matchPriority = !priority || t.mucDoUuTien === priority;
+
+          // Lọc loại sự cố
+          const matchType = !type || t.loaiSuCo === type;
+
+          // Lọc ngày phát sinh
+          // let matchDate = true;
+          // if (date) {
+          //   // Vì input date trả về YYYY-MM-DD, cần đảm bảo t.ngayPhatSinh có định dạng tương ứng để so sánh
+          //   // Hoặc xử lý chuỗi nếu t.ngayPhatSinh là định dạng khác (ví dụ DD/MM/YYYY)
+          //   matchDate = t.ngayPhatSinh && t.ngayPhatSinh.includes(date);
+          // }
+
+          // Kết hợp tất cả điều kiện (AND)
+          return matchStatus && matchPriority && matchType;
+        });
+
+        // 3. Hiển thị thông báo nếu không tìm thấy kết quả
+        if (list.length === 0) {
+          box.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 50px; color: #999;">
+              <div style="font-size: 48px; margin-bottom: 10px;">🔍</div>
+              <p>Không tìm thấy ticket nào khớp với bộ lọc của bạn.</p>
+            </div>`;
+          return;
+        }
+
+        // 4. Render danh sách ticket đã lọc
+        list.forEach((t) => {
+          const div = document.createElement("div");
+          div.className = "ticket";
+
+          // Thêm style đặc biệt cho P1 - Khẩn cấp để dễ nhận diện
+          if (t.mucDoUuTien === "P1 - Khẩn cấp") {
+            div.style.borderLeft = "5px solid #e74c3c";
+          }
+
+          div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+              <small style="color: #888;">#${t.maSuCo}</small>
+              <small style="color: #666; font-weight: 500;">📅 ${t.ngayPhatSinh}</small>
+            </div>
+            <div style="margin-bottom: 10px;">
+              <b style="font-size: 15px; color: #2d3436;">${t.nguoiBaoSuCo}</b>
+              <span style="font-size: 12px; color: #636e72;">(${t.boPhan})</span>
+            </div>
+            <div style="margin-bottom: 10px; font-size: 14px;">
+              <span style="background: #f1f2f6; padding: 2px 6px; border-radius: 4px; font-weight: bold; color: #2f3542;">${t.loaiSuCo}</span>
+              <span style="color: #2f3542;">${t.moTaSuCo}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; border-top: 1px solid #eee; padding-top: 10px;">
+              <span class="status ${statusClass(t.trangThai)}">
+                ${t.trangThai}
+              </span>
+              <span style="font-size: 12px; font-weight: 600; color: #667eea;">
+                👤 ${t.nguoiTiepNhan || "Chưa gán"}
+              </span>
+            </div>
+          `;
+          div.onclick = () => openModal(t);
+          box.appendChild(div);
+        });
+      }
+
+      function openModal(t) {
+        current = t;
+        modal.classList.add("active");
+        mMa.value = t.maSuCo;
+        mStatus.value = t.trangThai;
+        mNguyenNhan.value = t.nguyenNhan || "";
+        mXuLy.value = t.huongXuLy || "";
+        mTime.value = t.thoiGianXuLy || "";
+        mNote.value = t.ghiChu || "";
+      }
+
+      function closeModal() {
+        modal.classList.remove("active");
+      }
+
+      function save() {
+        if (!current) return;
+
+        google.script.run
+          .withSuccessHandler(() => {
+            closeModal();
+            loadTickets();
+          })
+          .updateTicket({
+            maSuCo: current.maSuCo,
+            trangThai: mStatus.value,
+            nguyenNhan: mNguyenNhan.value,
+            huongXuLy: mXuLy.value,
+            thoiGianXuLy: mTime.value,
+            ghiChu: mNote.value,
+          });
+      }
+
+      function goToCreate() {
+        google.script.run
+          .withSuccessHandler(function (url) {
+            window.top.location.href = url + "?page=create";
+          })
+          .getWebAppUrl();
+      }
+
+      window.onload = loadTickets;
+    </script>
+  </body>
+</html>
