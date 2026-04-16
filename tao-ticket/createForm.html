@@ -3,8 +3,753 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base target="_top" />
     <title>Helpdesk - Gửi Yêu Cầu Hỗ Trợ</title>
-    <link rel="stylesheet" href="./style.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 800px;
+        width: 100%;
+        padding: 40px;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .header h1 {
+        color: #333;
+        font-size: 28px;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        color: #666;
+        font-size: 14px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+        width: 100%;
+      }
+
+      .form-row.row-2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .form-group {
+        margin-bottom: 25px;
+        width: 100%;
+      }
+
+      .form-group.full-width {
+        grid-column: 1 / -1;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .required {
+        color: #e74c3c;
+      }
+
+      .autocomplete {
+        position: relative;
+      }
+
+      .suggest-box {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+
+        background: white;
+        border: 1px solid #cbd5e1;
+        border-top: none;
+
+        max-height: 180px;
+        overflow-y: auto;
+
+        z-index: 999;
+        display: none;
+      }
+
+      .suggest-item {
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .suggest-item:hover {
+        background: #e0f2fe;
+      }
+
+      input[type="text"],
+      input[type="date"],
+      input[type="tel"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s;
+        font-family: inherit;
+      }
+
+      input[type="text"]:focus,
+      input[type="date"]:focus,
+      input[type="tel"]:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      #trangThai,
+      #mStatus {
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .system-time {
+        background: #f1f5f9 !important;
+        color: #1e293b;
+        font-weight: 600;
+        cursor: not-allowed;
+      }
+
+      .file-upload {
+        border: 2px dashed #e0e0e0;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: #f8f9fa;
+      }
+
+      .file-upload:hover {
+        border-color: #667eea;
+        background: #f0f2ff;
+      }
+
+      .file-upload.drag-over {
+        border-color: #667eea;
+        background: #e8ebff;
+      }
+
+      .file-upload-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+        color: #667eea;
+      }
+
+      .file-upload-text {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 5px;
+      }
+
+      .file-upload-hint {
+        color: #999;
+        font-size: 12px;
+      }
+
+      input[type="file"] {
+        display: none;
+      }
+
+      .file-list {
+        margin-top: 15px;
+      }
+
+      .file-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+      }
+
+      .file-item-content {
+        display: flex;
+        align-items: center;
+        gap: 12px; /* khoảng cách giữa icon và info */
+        flex: 1;
+      }
+
+      .file-item-info {
+        flex: 1;
+      }
+
+      .file-item-icon {
+        font-size: 24px;
+        color: #6c757d;
+      }
+
+      .file-item-name {
+        font-weight: 500;
+        color: #212529;
+        word-break: break-all;
+      }
+
+      .file-item-size {
+        font-size: 12px;
+        color: #6c757d;
+      }
+
+      .remove-file {
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 6px 12px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: background 0.2s;
+        white-space: nowrap;
+      }
+
+      .remove-file:hover {
+        background: #c82333;
+      }
+
+      .btn-submit {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+      }
+
+      .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn-submit:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .loading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .loading.active {
+        display: block;
+      }
+
+      .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 10px;
+      }
+
+      /* Style cho khối bổ sung */
+      #extraInfoFields {
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        transition:
+          max-height 0.5s cubic-bezier(0, 1, 0, 1),
+          opacity 0.3s ease; /* Hiệu ứng mượt */
+        background: #f8f9fa;
+        padding: 0 15px;
+        border-radius: 8px;
+        border-left: 5px solid #2196f3;
+        margin-top: 10px;
+      }
+
+      /* Class này sẽ được thêm bằng JS khi click */
+      #extraInfoFields.is-visible {
+        max-height: 1000px; /* Đủ lớn để chứa nội dung bên trong */
+        opacity: 1;
+        padding: 15px; /* Hiện lại padding khi mở */
+        margin-bottom: 20px;
+        transition:
+          max-height 0.8s ease-in-out,
+          opacity 0.5s ease;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .message {
+        display: none;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      .message.active {
+        display: block;
+      }
+
+      .message.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .message.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+
+      /* Container giữ nút ở vị trí cố định */
+      .it-admin-wrapper {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        z-index: 9999;
+      }
+
+      #redirectBox {
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      .btn-it-admin {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px 20px;
+
+        /* Hiệu ứng kính mờ cao cấp */
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+
+        /* Border mảnh và đổ bóng đa lớp */
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50px;
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06),
+          inset 0 1px 0 rgba(255, 255, 255, 0.5);
+
+        color: #1e293b;
+        font-weight: 600;
+        font-size: 13px;
+        letter-spacing: 0.3px;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        white-space: nowrap; /* Ngăn vỡ chữ khi co màn hình */
+      }
+
+      /* Hiệu ứng Icon */
+      .btn-it-admin i {
+        font-size: 15px;
+        color: #3b82f6; /* Màu xanh đặc trưng IT */
+        transition: transform 0.3s ease;
+      }
+
+      /* Hover: Chuyển sang tông xanh đậm chất công nghệ */
+      .btn-it-admin:hover {
+        background: #2563eb;
+        color: #ffffff;
+        border-color: #2563eb;
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+      }
+
+      .btn-it-admin:hover i {
+        color: #ffffff;
+        transform: rotate(15deg); /* Xoay nhẹ icon cho sinh động */
+      }
+
+      /* Active: Khi bấm vào */
+      .btn-it-admin:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 12px;
+        margin-top: 15px;
+      }
+
+      .logout-wrapper {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        display: none; /* Mặc định ẩn */
+      }
+
+      .btn-logout {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        transition: all 0.3s ease;
+      }
+
+      .btn-logout:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+        background: linear-gradient(135deg, #dc2626, #b91c1c);
+      }
+
+      .btn-logout i {
+        font-size: 16px;
+      }
+
+      .suggest-box {
+        position: absolute;
+        background: #fff;
+        border: 1px solid #ddd;
+        width: 100%;
+        max-height: 220px;
+        overflow-y: auto;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 999;
+      }
+
+      .suggest-item {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+
+      .suggest-item:hover {
+        background: #f0f4ff;
+      }
+
+      /* Giới hạn chiều rộng select và option */
+      #selectSuCoMau {
+        max-width: 100%; /* hoặc giá trị cụ thể như 400px */
+        width: 100%;
+      }
+
+      /* Style cho option: cắt ngắn + ellipsis */
+      #selectSuCoMau option {
+        white-space: nowrap; /* không wrap */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%; /* hoặc 380px nếu muốn cố định */
+        display: block; /* giúp ellipsis hoạt động tốt hơn */
+      }
+
+      /* Optional: Khi hover option, hiển thị full text bằng tooltip */
+      #selectSuCoMau option:hover {
+        background-color: #e0f7fa; /* highlight nhẹ */
+      }
+
+      /* ================= MOBILE FIRST IMPROVEMENT ================= */
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 25px;
+        }
+
+        .header h1 {
+          font-size: 24px;
+        }
+
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+        .form-row.row-2 {
+          grid-template-columns: 1fr !important;
+          gap: 14px;
+        }
+
+        .form-group {
+          display: flex;
+          flex-direction: column;
+        }
+
+        select,
+        input,
+        textarea {
+          height: 44px;
+          line-height: 44px;
+          padding-top: 0;
+          padding-bottom: 0;
+        }
+
+        textarea {
+          height: auto;
+          line-height: 1.5;
+        }
+        .logout-wrapper {
+          top: 10px;
+          right: 10px;
+        }
+
+        .btn-logout {
+          padding: 8px 14px;
+          font-size: 13px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .btn-it-admin span {
+          display: none;
+        }
+        .btn-it-admin {
+          padding: 12px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .file-item-name {
+          max-width: 120px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .action-buttons {
+          flex-direction: column;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .it-admin-wrapper {
+          top: auto;
+          bottom: 15px;
+          right: 15px;
+          z-index: 9999;
+        }
+
+        .btn-it-admin {
+          background: linear-gradient(135deg, #2563eb, #4f46e5);
+          color: #fff;
+          padding: 12px 18px;
+          border-radius: 999px;
+          box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+          font-size: 14px;
+          font-weight: 600;
+          min-width: 170px;
+          justify-content: center;
+        }
+
+        .btn-it-admin span {
+          display: inline;
+          font-size: 13px;
+        }
+
+        .btn-it-admin span::after {
+          content: " IT Admin";
+        }
+
+        .btn-it-admin i {
+          color: #fff;
+          font-size: 16px;
+        }
+      }
+
+      /* Input & button to dễ bấm trên mobile */
+      input,
+      select,
+      textarea,
+      button {
+        font-size: 16px; /* tránh zoom trên iOS */
+      }
+
+      /* Form spacing gọn gàng hơn */
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      /* Container mobile */
+      @media (max-width: 768px) {
+        body {
+          padding: 10px;
+          align-items: flex-start;
+        }
+
+        .container {
+          padding: 20px;
+          border-radius: 14px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+          font-size: 22px;
+        }
+
+        .header p {
+          font-size: 13px;
+        }
+
+        /* 1 cột cho tablet/mobile */
+        .form-row {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+
+        label {
+          font-size: 13px;
+        }
+
+        input,
+        select,
+        textarea {
+          padding: 10px 12px;
+        }
+
+        /* Button group */
+        form > div:last-child {
+          flex-direction: column;
+        }
+
+        .btn-submit {
+          width: 100%;
+          font-size: 15px;
+        }
+
+        /* File upload */
+        .file-upload {
+          padding: 20px 10px;
+        }
+
+        .file-upload-icon {
+          font-size: 36px;
+        }
+
+        /* Extra info box */
+        #extraInfoFields {
+          padding: 10px;
+        }
+      }
+
+      /* Mobile nhỏ (điện thoại < 480px) */
+      @media (max-width: 480px) {
+        .container {
+          padding: 16px;
+        }
+
+        .header h1 {
+          font-size: 20px;
+        }
+
+        .header p {
+          font-size: 12px;
+        }
+
+        label {
+          font-size: 12px;
+        }
+
+        input,
+        select,
+        textarea {
+          font-size: 14px;
+        }
+
+        textarea {
+          min-height: 80px;
+        }
+
+        /* Nút IT Admin thu nhỏ */
+        .btn-it-admin {
+          padding: 8px 12px;
+        }
+
+        .btn-it-admin span {
+          display: none;
+        }
+      }
+
+      /* ================= UI POLISH ================= */
+
+      /* Hiệu ứng focus đẹp hơn */
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+      }
+
+      /* Card shadow mượt */
+      .container {
+        transition: all 0.3s ease;
+      }
+
+      .container:hover {
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+      }
+
+      /* File item hover */
+      .file-item:hover {
+        background: #eef2ff;
+      }
+
+      /* Button animation */
+      .btn-submit:active {
+        transform: scale(0.98);
+      }
+    </style>
   </head>
   <body>
     <div class="container">
@@ -16,44 +761,81 @@
       <form id="helpdeskForm">
         <!-- Row 1 -->
         <div class="form-row">
-          <!-- <div class="form-group">
-            <label>Mã sự cố</label>
+          <div style="display: none" class="form-group">
             <input
               type="text"
               id="maSuCo"
               name="maSuCo"
               readonly
-              placeholder="Tự động tạo"
+              placeholder="Tự động tạo (INC-YYYYMMDD-XXXX)"
             />
-          </div> -->
+          </div>
 
           <div class="form-group">
-            <label>Ngày phát sinh <span class="required">*</span></label>
-            <input type="date" id="ngayPhatSinh" name="ngayPhatSinh" required />
+            <label>Ngày và giờ phát sinh <span class="required">*</span></label>
+            <input
+              type="datetime-local"
+              id="ngayPhatSinh"
+              name="ngayPhatSinh"
+              readonly
+              style="
+                background-color: #f0f0f0;
+                cursor: not-allowed;
+                width: 100%;
+                padding: 8px;
+                border-radius: 8px;
+              "
+            />
+          </div>
+
+          <div class="form-group" id="maNVWrapper">
+            <label>Mã nhân viên <span class="required">*</span></label>
+            <input
+              type="text"
+              id="maNhanVien"
+              placeholder="Nhập mã nhân viên..."
+              autocomplete="off"
+            />
           </div>
         </div>
 
         <!-- Row 2 -->
-        <div class="form-row">
-          <div class="form-group">
-            <label>Người báo sự cố <span class="required">*</span></label>
+        <div class="form-row row-2" id="rowUserInfo">
+          <!-- Người báo sự cố -->
+          <div class="form-group autocomplete">
+            <label>Người báo sự cố</label>
             <input
               type="text"
               id="nguoiBaoSuCo"
-              name="nguoiBaoSuCo"
-              required
-              placeholder="Họ và tên"
+              list="listHoTen"
+              placeholder="Nhập tên người báo cáo sự cố..."
+              autocomplete="off"
             />
           </div>
 
+          <!-- Mã khoa phòng -->
           <div class="form-group">
-            <label>Bộ phận <span class="required">*</span></label>
+            <label>Mã khoa phòng <span class="required">*</span></label>
             <input
               type="text"
-              id="boPhan"
-              name="boPhan"
-              required
-              placeholder="IT, Kế toán, Marketing..."
+              id="maKhoaPhong"
+              name="maKhoaPhong"
+              placeholder="Tự động hiển thị"
+              style="background-color: #f0f0f0; cursor: not-allowed"
+            />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Số Zalo 💬</label>
+            <input
+              type="tel"
+              id="soDienThoai"
+              name="soDienThoai"
+              placeholder="VD: 0909123456"
+              pattern="[0-9]{9,11}"
+              style="background-color: #f0f0f0; cursor: not-allowed"
             />
           </div>
         </div>
@@ -61,116 +843,122 @@
         <!-- Row 3 -->
         <div class="form-row">
           <div class="form-group">
-            <label>Loại sự cố <span class="required">*</span></label>
+            <div class="label-row">
+              <label>Loại sự cố <span class="required">*</span></label>
+            </div>
             <select id="loaiSuCo" name="loaiSuCo" required>
               <option value="">-- Chọn loại sự cố --</option>
-              <option value="HIS">HIS (Hệ thống thông tin bệnh viện)</option>
-              <option value="BIS">
-                BIS (Hệ thống Thông tin Thanh toán/Tính phí)
-              </option>
-              <option value="RIS">
-                RIS (Hệ thống Thông tin Chẩn đoán Hình ảnh)
-              </option>
-              <option value="LIS">LIS (Hệ thống Thông tin Xét nghiệm)</option>
-              <option value="PHIS">PHIS (Hệ thống Thông tin Dược)</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Mức độ ưu tiên <span class="required">*</span></label>
-            <select id="mucDoUuTien" name="mucDoUuTien" required>
-              <option value="">-- Chọn mức độ --</option>
-              <option value="P1 - Khẩn cấp">P1 - Khẩn cấp</option>
-              <option value="P2 - Cao">P2 - Cao</option>
-              <option value="P3 - Thường">P3 - Thường</option>
             </select>
           </div>
         </div>
 
         <!-- Full width fields -->
         <div class="form-group">
-          <label>Mô tả sự cố <span class="required">*</span></label>
+          <label
+            >Danh mục sự cố thường gặp <span class="required">*</span></label
+          >
+          <input
+            type="text"
+            id="searchDanhMuc"
+            list="danhMucList"
+            placeholder="Nhập mã hoặc tên (ví dụ: HIS-01 hoặc Trùng số...), chọn OTHER nếu nhập mô tả khác..."
+            autocomplete="off"
+            required
+          />
+          <datalist id="danhMucList"></datalist>
+
+          <!-- Hiển thị mô tả đã chọn (tùy chọn) -->
+          <small
+            id="selectedMoTa"
+            style="color: #666; display: block; margin-top: 5px"
+          ></small>
+        </div>
+
+        <div class="form-group">
+          <label>Mô tả chi tiết sự cố <span class="required">*</span></label>
           <textarea
             id="moTaSuCo"
             name="moTaSuCo"
             required
-            placeholder="Vui lòng mô tả chi tiết vấn đề bạn gặp phải..."
+            placeholder="Nội dung sẽ tự động hiển thị khi chọn danh mục trên..."
           ></textarea>
         </div>
 
-        <div class="form-group">
-          <label>Người tiếp nhận <span class="required">*</span></label>
-          <select id="nguoiTiepNhan" name="nguoiTiepNhan" required>
-            <option value="">-- Chọn người tiếp nhận --</option>
-            <option value="Tuấn">Tuấn</option>
-            <option value="Hùng">Hùng</option>
-            <option value="Khoa">Khoa</option>
-            <option value="Huy">Huy</option>
-          </select>
-        </div>
+        <div
+          id="extraInfoFields"
+          style="
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #2196f3;
+            margin-top: -10px;
+            margin-bottom: 20px;
+          "
+        >
+          <h4 style="margin-top: 0; color: #2196f3; font-size: 14px">
+            📋 Thông tin bệnh nhân & Chỉ định liên quan
+          </h4>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Mã bệnh nhân</label>
+              <input
+                type="text"
+                id="maBenhNhan"
+                name="maBenhNhan"
+                placeholder="Nhập mã bệnh nhân..."
+                autocomplete="off"
+              />
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label>Nguyên nhân</label>
-          <textarea
-            id="nguyenNhan"
-            name="nguyenNhan"
-            placeholder="Nguyên nhân gây ra sự cố (có thể điền sau)"
-          ></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Hướng xử lý</label>
-          <textarea
-            id="huongXuLy"
-            name="huongXuLy"
-            placeholder="Cách xử lý sự cố (có thể điền sau)"
-          ></textarea>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Ngày báo cáo sự cố</label>
+              <input
+                type="datetime-local"
+                id="ngayChiDinh"
+                name="ngayChiDinh"
+                readonly
+                style="
+                  background-color: #f0f0f0;
+                  cursor: not-allowed;
+                  width: 100%;
+                  padding: 8px;
+                  border-radius: 8px;
+                "
+              />
+            </div>
+            <div class="form-group">
+              <label>Hạng mục/Dịch vụ lỗi</label>
+              <input
+                type="text"
+                id="tenChiDinh"
+                name="tenChiDinh"
+                placeholder="VD: Siêu âm, Xét nghiệm máu..."
+              />
+            </div>
+          </div>
         </div>
 
         <!-- Row 4 - Time fields -->
         <div class="form-row">
-          <div class="form-group">
-            <label>Thời gian bắt đầu xử lý</label>
-            <input
-              size="50"
-              type="datetime-local"
-              id="thoiGianBatDau"
-              name="thoiGianBatDau"
-            />
-          </div>
-
-          <div class="form-group">
-            <label>Thời gian hoàn tất</label>
-            <input
-              size="50"
-              type="datetime-local"
-              id="thoiGianHoanTat"
-              name="thoiGianHoanTat"
-            />
-          </div>
+          <input type="hidden" id="thoiGianBatDau" />
+          <input type="hidden" id="thoiGianHoanTat" />
         </div>
 
         <div class="form-row">
-          <div class="form-group">
+          <!-- <div class="form-group">
             <label>Thời gian xử lý (phút)</label>
             <input
               type="text"
               id="thoiGianXuLy"
               name="thoiGianXuLy"
-              placeholder="Ví dụ: 30"
+              placeholder="Tự động tính toán..."
+              readonly
+              style="background-color: #f0f0f0; font-weight: bold; color: #2196F3;"
             />
-          </div>
-
-          <div class="form-group">
-            <label>Trạng thái <span class="required">*</span></label>
-            <select id="trangThai" name="trangThai" required>
-              <option value="">-- Chọn trạng thái --</option>
-              <option value="Mới">Mới</option>
-              <option value="Đang xử lý">Đang xử lý</option>
-              <option value="Hoàn thành">Hoàn tất</option>
-              <option value="Đóng">Đóng</option>
-            </select>
-          </div>
+          </div> -->
+          <input type="hidden" id="thoiGianXuLy" />
         </div>
 
         <!-- File upload -->
@@ -191,7 +979,7 @@
             multiple
             accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
           />
-          <div class="file-list" id="fileList"></div>
+          <div class="file-list" id="fileListnguoiTiepNhan"></div>
         </div>
 
         <div class="form-group">
@@ -203,21 +991,21 @@
           ></textarea>
         </div>
 
-        <div style="display: flex; gap: 10px; margin-top: 15px">
+        <div class="">
           <button type="submit" class="btn-submit" id="submitBtn">
             📤 Gửi yêu cầu
           </button>
-
-          <button
-            type="button"
-            class="btn-submit"
-            id="btnAdmin"
-            style="background: linear-gradient(135deg, #00b09b, #96c93d)"
-          >
-            📊 Xem danh sách
-          </button>
         </div>
       </form>
+
+      <!-- <div class="it-admin-wrapper" id="itAdminWrapper">
+        <button onclick="goToAdmin()" class="btn-it-admin" title="Quản trị hệ thống">
+          <i class="fas fa-user-shield"></i>
+          <span>Đăng nhập cho Kỹ thuật viên IT</span>
+        </button>
+      </div> -->
+
+      <div id="redirectBox"></div>
 
       <div class="loading" id="loading">
         <div class="spinner"></div>
@@ -227,13 +1015,25 @@
       <div class="message" id="message"></div>
     </div>
 
+    <!-- ✅ NÚT ĐĂNG XUẤT (chỉ hiện khi đã login) -->
+    <div class="logout-wrapper" id="logoutWrapper">
+      <button
+        onclick="handleLogout()"
+        class="btn-logout"
+        title="Đăng xuất tài khoản"
+      >
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Đăng xuất</span>
+      </button>
+    </div>
+
     <script>
-      // Configuration - CẦN THAY ĐỔI
+      // Configuration
       const CONFIG = {
-        // Thay bằng URL Google Apps Script Web App của bạn
-        SCRIPT_URL:
-          "https://script.google.com/macros/s/AKfycbwlOBzyInlcxZAwbmFlWUnJ3t7M80YJRHNd5Yz1SRY_fSun9XLOPxXZcqJaWjeOBBYv/exec",
+        SCRIPT_URL: "", // sẽ set động sau
+
         MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
+
         ALLOWED_TYPES: [
           "image/jpeg",
           "image/png",
@@ -244,9 +1044,289 @@
           "application/vnd.ms-excel",
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         ],
+
+        // ✅ Check thêm bằng extension (chống fake MIME)
+        ALLOWED_EXTENSIONS: [
+          "jpg",
+          "jpeg",
+          "png",
+          "gif",
+          "pdf",
+          "doc",
+          "docx",
+          "xls",
+          "xlsx",
+        ],
       };
 
       let selectedFiles = [];
+      let danhSachTen = [];
+      let isFetchingNhanVien = false;
+
+      const moTaSuCoInput = document.getElementById("moTaSuCo");
+      const maNVInput = document.getElementById("maNhanVien");
+      const tenNVInput = document.getElementById("nguoiBaoSuCo");
+      const maNVGroup = document.getElementById("maNVGroup");
+      const maKhoaPhongInput = document.getElementById("maKhoaPhong");
+      const extraInfo = document.getElementById("extraInfoFields");
+      const formGroupParent = moTaSuCoInput.closest(".form-group").parentNode;
+
+      window.addEventListener("load", function () {
+        google.script.run
+          .withSuccessHandler(function (url) {
+            CONFIG.SCRIPT_URL = url;
+            //console.log("✅ SCRIPT_URL:", url);
+          })
+          .withFailureHandler(function (err) {
+            console.error("❌ Không lấy được SCRIPT_URL:", err);
+          })
+          .getWebAppUrl();
+      });
+
+      maNVInput.addEventListener("keydown", function (e) {
+        if (maNVInput.readOnly) return;
+        if (e.key === "Enter") {
+          e.preventDefault();
+          fetchNhanVien();
+        }
+      });
+
+      function fetchNhanVien() {
+        const ma = maNVInput.value.trim();
+        // Reset nếu trống
+        if (!ma) {
+          tenNVInput.value = "";
+          maKhoaPhongInput.value = "";
+          return;
+        }
+        // Disable khi loading
+        maNVInput.disabled = true;
+        google.script.run
+          .withSuccessHandler(function (res) {
+            maNVInput.disabled = false;
+            if (res && res.hoTen) {
+              // Fill dữ liệu
+              tenNVInput.value = res.hoTen;
+              maKhoaPhongInput.value = res.maKhoaPhong || "";
+            } else {
+              alert("❌ Không tìm thấy mã nhân viên!");
+              tenNVInput.value = "";
+              maKhoaPhongInput.value = "";
+              maNVInput.focus();
+            }
+          })
+          .withFailureHandler(function (err) {
+            maNVInput.disabled = false;
+            console.error(err);
+            alert("❌ Lỗi khi tra nhân viên!");
+          })
+          .getNhanVienByMa(ma);
+      }
+
+      // Tìm chính xác tên từ danh sách có sẵn
+      function findExactName(inputName) {
+        const normalizedInput = removeVietnameseTones(inputName);
+
+        const found = danhSachTen.find((item) => {
+          return item.normalized === normalizedInput;
+        });
+
+        return found ? found.raw : null;
+      }
+
+      function fetchNhanVienByTen() {
+        if (isFetchingNhanVien) return; // Chặn gọi trùng
+        isFetchingNhanVien = true;
+
+        const ten = tenNVInput.value.trim();
+        if (!ten) {
+          isFetchingNhanVien = false;
+          return;
+        }
+        // ✅ Tìm tên CHÍNH XÁC từ danh sách có sẵn
+        const tenChinhXac = findExactName(ten) || ten;
+        tenNVInput.disabled = true;
+        google.script.run
+          .withSuccessHandler(function (res) {
+            tenNVInput.disabled = false;
+            isFetchingNhanVien = false;
+            if (res) {
+              // Fill dữ liệu
+              document.getElementById("maNhanVien").value = res.maNV || "";
+              tenNVInput.value = tenChinhXac;
+              maKhoaPhongInput.value = res.maKhoaPhong || "";
+              document.getElementById("soDienThoai").value =
+                res.soDienThoai || "";
+              // boPhanInput.value = res.boPhan || "";
+            } else {
+              maKhoaPhongInput.value = "";
+              tenNVInput.focus();
+            }
+          })
+          .withFailureHandler(function () {
+            tenNVInput.disabled = false;
+            isFetchingNhanVien = false;
+            //alert("❌ Lỗi tra cứu dữ liệu!");
+          })
+          .getNhanVienByTen(tenChinhXac);
+      }
+
+      // Nhấn Enter để tra
+      tenNVInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          fetchNhanVienByTen();
+        }
+      });
+
+      moTaSuCoInput.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (!extraInfo.classList.contains("is-visible")) {
+          extraInfo.classList.add("is-visible");
+        }
+      });
+
+      function removeVietnameseTones(str) {
+        if (!str) return "";
+        return str
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/đ/g, "d")
+          .replace(/Đ/g, "D")
+          .toLowerCase()
+          .trim();
+      }
+
+      function loadHoTen() {
+        google.script.run
+          .withSuccessHandler(function (names) {
+            danhSachTen = names.map((name) => ({
+              raw: name,
+              normalized: removeVietnameseTones(name),
+            }));
+            setupAutoComplete();
+          })
+          .getAllHoTen();
+      }
+
+      function loadBoPhan() {
+        google.script.run
+          .withSuccessHandler(function (names) {
+            const datalist = document.getElementById("listBoPhan");
+            datalist.innerHTML = "";
+
+            names.forEach((name) => {
+              const option = document.createElement("option");
+              option.value = name;
+              datalist.appendChild(option);
+            });
+          })
+          .getAllBoPhan();
+      }
+
+      function setupAutoComplete() {
+        const input = document.getElementById("nguoiBaoSuCo");
+
+        // Tạo box hiển thị gợi ý
+        let box = document.getElementById("suggestBox");
+
+        if (!box) {
+          box = document.createElement("div");
+          box.id = "suggestBox";
+          box.className = "suggest-box";
+          input.parentNode.appendChild(box);
+        }
+
+        input.addEventListener("input", function () {
+          const keywordRaw = this.value;
+          const keyword = removeVietnameseTones(keywordRaw);
+
+          box.innerHTML = "";
+
+          if (!keyword) {
+            box.style.display = "none";
+            return;
+          }
+
+          // FILTER THÔNG MINH
+          const result = danhSachTen.filter((item) => {
+            // Có thể match: họ, tên, full name
+            return item.normalized.includes(keyword);
+          });
+
+          if (result.length === 0) {
+            box.style.display = "none";
+            return;
+          }
+
+          // Render list
+          result.slice(0, 8).forEach((item) => {
+            const div = document.createElement("div");
+            div.className = "suggest-item";
+            div.textContent = item.raw;
+
+            div.onclick = function () {
+              input.value = item.raw;
+              box.style.display = "none";
+              // Auto fill info
+              fetchNhanVienByTen();
+            };
+
+            box.appendChild(div);
+          });
+
+          box.style.display = "block";
+        });
+
+        // Click ngoài → ẩn box
+        document.addEventListener("click", function (e) {
+          if (!input.contains(e.target) && !box.contains(e.target)) {
+            box.style.display = "none";
+          }
+        });
+      }
+
+      // Khi click bất kỳ đâu trên tài liệu
+      document.addEventListener("click", function (e) {
+        // Check xem nếu vị trí click KHÔNG nằm trong ô input và ko nằm trong khối thông tin thêm
+        const isClickInsideInput = moTaSuCoInput.contains(e.target);
+        const isClickInsideExtra = extraInfo.contains(e.target);
+
+        if (!isClickInsideInput && !isClickInsideExtra) {
+          // Nếu click ra ngoài vùng textbox -> Trượt lên để ẩn
+          extraInfo.classList.remove("is-visible");
+        }
+      });
+
+      extraInfo.addEventListener("click", function (e) {
+        e.stopPropagation();
+      });
+
+      function calculateProcessingTime() {
+        const startTimeVal = document.getElementById("thoiGianBatDau").value;
+        const endTimeVal = document.getElementById("thoiGianHoanTat").value;
+        const resultInput = document.getElementById("thoiGianXuLy");
+
+        if (startTimeVal && endTimeVal) {
+          const start = new Date(startTimeVal);
+          const end = new Date(endTimeVal);
+
+          // Tính toán chênh lệch (miliseconds)
+          const diffMs = end - start;
+
+          if (diffMs < 0) {
+            resultInput.value = "Lỗi: TG kết thúc < TG bắt đầu";
+            resultInput.style.color = "red";
+          } else {
+            // Chuyển đổi sang phút
+            const diffMins = Math.round(diffMs / (1000 * 60));
+            resultInput.value = diffMins;
+            resultInput.style.color = ""; // Reset màu chữ bình thường
+          }
+        } else {
+          resultInput.value = ""; // Để trống nếu 1 trong 2 ô chưa nhập
+        }
+      }
 
       // Generate incident ID
       function generateIncidentID() {
@@ -254,50 +1334,474 @@
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, "0");
         const day = String(now.getDate()).padStart(2, "0");
-        return `INC-${year}${month}${day}-????`;
+
+        const loaiSelect = document.getElementById("loaiSuCo");
+        const loai = loaiSelect && loaiSelect.value ? loaiSelect.value : "INC";
+        return loai + "-" + year + month + day + "-XXXX";
       }
 
-      // Set default values
-      window.onload = function () {
-        // document.getElementById("maSuCo").value = generateIncidentID();
-        document.getElementById("ngayPhatSinh").value = new Date();
-        document.getElementById("trangThai").value = "Mới";
-      };
+      function getLoaiSuCo() {
+        const allOptions = { ...OPTIONS.LOAI_SU_CO };
+        try {
+          const ss = SpreadsheetApp.getActiveSpreadsheet();
+          const sheet = ss.getSheetByName("SHEET_NAME");
+          if (sheet) {
+            const data = sheet.getDataRange().getValues();
+            for (let i = 1; i < data.length; i++) {
+              const [ma, ten, bg, fg] = data[i];
+              if (ma) {
+                allOptions[ma] = {
+                  bg: bg,
+                  fg: fg,
+                  label: ten,
+                };
+              }
+            }
+          }
+        } catch (e) {
+          console.log("Lỗi lấy danh mục: " + e.message);
+        }
+        // CHUYỂN OBJECT → ARRAY
+        return Object.keys(allOptions).map((ma) => ({
+          ma: ma,
+          ten: allOptions[ma].label,
+          bg: allOptions[ma].bg,
+          fg: allOptions[ma].fg,
+        }));
+      }
+
+      function handleSelectSuCo(selectElement) {
+        const moTaTextArea = document.getElementById("moTaSuCo");
+        const tenChiDinh = document.getElementById("tenChiDinh");
+        const selectedValue = selectElement.value;
+
+        if (selectedValue === "") {
+          moTaTextArea.value = "";
+          if (tenChiDinh) tenChiDinh.value = "";
+          return;
+        }
+
+        if (selectedValue === "OTHER") {
+          moTaTextArea.value = "";
+          moTaTextArea.placeholder = "Vui lòng nhập chi tiết sự cố tại đây...";
+          moTaTextArea.focus();
+          if (tenChiDinh) tenChiDinh.value = "";
+        } else {
+          // Lấy text đầy đủ từ option (không rút gọn)
+          const selectedOption =
+            selectElement.options[selectElement.selectedIndex];
+          const fullText = selectedOption.title || selectedOption.textContent;
+
+          // Chỉ lấy phần mô tả (bỏ mã HIS-02 - )
+          const moTa = fullText.replace(/^[A-Z]+-\d+\s*-\s*/, "").trim();
+          moTaTextArea.value = moTa;
+
+          // Điền hạng mục/dịch vụ lỗi
+          if (tenChiDinh) tenChiDinh.value = moTa;
+        }
+
+        // Hiện phần thông tin bệnh nhân nếu cần
+        const extraInfo = document.getElementById("extraInfoFields");
+        if (!extraInfo.classList.contains("is-visible")) {
+          extraInfo.classList.add("is-visible");
+        }
+      }
+
+      // Tự động cập nhật mã sự cố khi user chọn loại sự cố
+      document
+        .getElementById("loaiSuCo")
+        .addEventListener("change", function () {
+          const maSuCoInput = document.getElementById("maSuCo");
+          if (maSuCoInput) {
+            maSuCoInput.value = generateIncidentID();
+          }
+        });
+
+      // Cập nhật lại sự kiện cho ô moTaSuCo
+      // moTaSuCoInput.addEventListener("click", function(e) {
+      //   e.stopPropagation();
+      //   extraInfo.classList.add("is-visible");
+      // });
+
+      // function loadLoaiSuCo() {
+      //   const select = document.getElementById("loaiSuCo");
+      //   if (!select) return;
+      //   // reset
+      //   select.innerHTML = '<option value="">-- Chọn loại sự cố --</option>';
+
+      //   google.script.run
+      //     .withSuccessHandler(function(loaiList) {
+      //       if (!loaiList || loaiList.length === 0) {
+      //         console.warn("Không có dữ liệu loại sự cố");
+      //         return;
+      //       }
+
+      //       loaiList.forEach(function(item) {
+      //         const opt = document.createElement("option");
+      //         opt.value = item.ma;
+      //         opt.textContent = item.ten;
+      //         select.appendChild(opt);
+      //       });
+
+      //       console.log("✅ Đã load loại sự cố:", loaiList.length);
+      //     })
+      //     .withFailureHandler(function(err) {
+      //       console.error("❌ Lỗi tải loại sự cố:", err);
+      //       alert("Không tải được danh sách loại sự cố.");
+      //     })
+      //     .getAllLoaiSuCo();
+      // }
+
+      // Load loại sự cố lớn (HIS/BIS/LIS/RIS)
+      function loadLoaiSuCo() {
+        const select = document.getElementById("loaiSuCo");
+        if (!select) return;
+
+        select.innerHTML = '<option value="">-- Chọn loại sự cố --</option>';
+
+        // Dùng OPTIONS hiện có hoặc load từ server nếu cần
+        const loaiList = [
+          { ma: "HIS", ten: "HIS (Hệ thống thông tin bệnh viện)" },
+          { ma: "BIS", ten: "BIS (Hệ thống Thông tin Thanh toán/Tính phí)" },
+          { ma: "RIS", ten: "RIS (Hệ thống Thông tin Chẩn đoán Hình ảnh)" },
+          { ma: "LIS", ten: "LIS (Hệ thống Thông tin Xét nghiệm)" },
+        ];
+
+        loaiList.forEach((item) => {
+          const opt = document.createElement("option");
+          opt.value = item.ma;
+          opt.textContent = item.ten;
+          select.appendChild(opt);
+        });
+      }
+
+      // Biến lưu toàn bộ danh mục theo loại
+      let currentDanhMucList = [];
+
+      document
+        .getElementById("loaiSuCo")
+        .addEventListener("change", function () {
+          const loai = this.value.trim();
+          const inputSearch = document.getElementById("searchDanhMuc");
+          const datalist = document.getElementById("danhMucList");
+          const moTa = document.getElementById("moTaSuCo");
+          const selectedMoTa = document.getElementById("selectedMoTa");
+
+          // Reset
+          inputSearch.value = "";
+          datalist.innerHTML = "";
+          moTa.value = "";
+          if (selectedMoTa) selectedMoTa.textContent = "";
+
+          if (!loai) return;
+
+          google.script.run
+            .withSuccessHandler(function (items) {
+              currentDanhMucList = items; // Lưu => dùng cho tìm kiếm
+              items.forEach(function (item) {
+                const option = document.createElement("option");
+                option.value = item.ma; // HIS-02
+                option.textContent = `${item.ma} - ${item.ten}`; // hiển thị đầy đủ
+                option.dataset.moTa = item.ten; // lưu mô tả => fill sau
+                datalist.appendChild(option);
+              });
+
+              // Thêm tùy chọn Khác
+              const other = document.createElement("option");
+              other.value = "OTHER";
+              other.textContent = "-- Khác (nhập mô tả bên dưới) --";
+              other.dataset.moTa = "";
+              datalist.appendChild(other);
+            })
+            .withFailureHandler(function (err) {
+              console.error("Lỗi tải danh mục:", err);
+              alert("Không tải được danh mục sự cố. Vui lòng thử lại.");
+            })
+            .getDanhMucByLoai(loai); // hoặc getDanhMucByLoaiCached nếu chưa cache
+        });
+
+      // Xử lý khi chọn/gõ xong trong input search
+      document
+        .getElementById("searchDanhMuc")
+        .addEventListener("input", function () {
+          const value = this.value.trim().toUpperCase();
+          const moTa = document.getElementById("moTaSuCo");
+          const selectedMoTa = document.getElementById("selectedMoTa");
+
+          if (!value) {
+            moTa.value = "";
+            if (selectedMoTa) selectedMoTa.textContent = "";
+            return;
+          }
+
+          const found = currentDanhMucList.find(
+            (item) =>
+              item.ma && item.ma.toString().trim().toUpperCase() === value,
+          );
+
+          // Nếu user nhập đúng mã => hiện mã và tên danh mục sự cố cụ thể
+          if (found) {
+            moTa.value = found.ten;
+
+            if (selectedMoTa) {
+              selectedMoTa.textContent = `Đã chọn: ${found.ma} - ${found.ten}`;
+              selectedMoTa.style.color = "#2e7d32";
+            }
+
+            const tenChiDinh = document.getElementById("tenChiDinh");
+            if (tenChiDinh) tenChiDinh.value = found.ten;
+
+            const extraInfo = document.getElementById("extraInfoFields");
+            if (!extraInfo.classList.contains("is-visible")) {
+              extraInfo.classList.add("is-visible");
+            }
+          } else {
+            moTa.value = "";
+            if (selectedMoTa) selectedMoTa.textContent = "";
+          }
+        });
+
+      // Khi blur (rời input) → kiểm tra lại nếu cần
+      // document.getElementById("searchDanhMuc").addEventListener("blur", function () {
+      //   const value = this.value.trim().toUpperCase();
+      //   const moTa = document.getElementById("moTaSuCo");
+      //   const selectedMoTa = document.getElementById("selectedMoTa");
+      //   const loaiSelect = document.getElementById("loaiSuCo");
+
+      //   if (!value) return;
+
+      //   // Code cũ lỗi vì khi bị null => giá trị null => đẩy vào trường hợp other
+      //   // const found = currentDanhMucList.find(item =>
+      //   //   item.ma.toUpperCase() === value
+      //   // );
+
+      //   // Code mới có kiểm tra null, ép kiểu string, an toàn dữ liệu => ko bị lỗi
+      //   const found = currentDanhMucList.find(item =>
+      //     item.ma && item.ma.toString().trim().toUpperCase() === value
+      //   );
+
+      //   // ================================
+      //   // 1️⃣ Nếu danh mục tồn tại
+      //   // ================================
+      //   if (found) {
+      //     const prefixDanhMuc = found.ma.split("-")[0];
+      //     const loaiDaChon = loaiSelect.value;
+
+      //     // ❌ Nếu prefix danh mục khác loại sự cố
+      //     if (prefixDanhMuc !== loaiDaChon) {
+      //       alert(
+      //         "⚠️ Danh mục sự cố không thuộc loại sự cố đã chọn.\n\n" +
+      //         "Loại hiện tại: " + loaiDaChon +
+      //         "\nDanh mục thuộc: " + prefixDanhMuc
+      //       );
+      //       // reset input mô tả sự cố loại sự cố đã chọn ko tồn tại
+      //       this.value = "";
+      //       moTa.value = "";
+      //       if (selectedMoTa) {
+      //         selectedMoTa.textContent = "";
+      //       }
+      //       this.focus();
+      //       return;
+      //     }
+
+      //     // fill mô tả sự cố
+      //     moTa.value = found.ten || found.mota || "";
+      //     if (selectedMoTa) {
+      //       selectedMoTa.textContent = `Đã chọn: ${found.ma} - ${found.ten || found.mota}`;
+      //       selectedMoTa.style.color = "#2e7d32";
+      //     }
+      //     return;
+      //   }
+
+      //   // ================================
+      //   // 2️⃣ Nếu user nhập danh mục mới
+      //   // ================================
+      //   if (value !== "OTHER") {
+      //     const loaiDaChon = loaiSelect.value;
+      //     // Nếu user nhập mã danh mục HIS-99 nhưng loại là BIS (chống lệch loại sự cố)
+      //     if (value.includes("-")) {
+      //       const prefixNhap = value.split("-")[0];
+      //       if (prefixNhap !== loaiDaChon) {
+      //         alert(
+      //           "⚠️ Danh mục bạn nhập không đúng loại sự cố.\n\n" +
+      //           "Hệ thống sẽ chuyển sang chế độ mode 'OTHER'."
+      //         );
+      //       }
+      //     }
+      //     this.value = "OTHER";
+      //     moTa.value = value;
+      //     moTa.focus();
+
+      //     if (selectedMoTa) {
+      //       selectedMoTa.textContent = "Danh mục mới sẽ được tạo tự động.";
+      //       selectedMoTa.style.color = "#ff9800";
+      //     }
+      //   }
+      // });
+
+      // Khi blur (rời input) → kiểm tra lại nếu cần
+      document
+        .getElementById("searchDanhMuc")
+        .addEventListener("blur", function () {
+          const value = this.value.trim().toUpperCase();
+          const moTa = document.getElementById("moTaSuCo");
+          const selectedMoTa = document.getElementById("selectedMoTa");
+
+          if (!value) return;
+          const found = currentDanhMucList.find(
+            (item) => item.ma.toUpperCase() === value,
+          );
+
+          if (!found && value !== "OTHER") {
+            this.value = "OTHER";
+            moTa.value = value;
+            moTa.focus();
+
+            if (selectedMoTa) {
+              selectedMoTa.textContent = "Danh mục mới sẽ được tạo tự động.";
+              selectedMoTa.style.color = "#ff9800";
+            }
+          }
+        });
+
+      // Hàm set đặt ngày mặc định hệ thống
+      function setTodayDate() {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, "0");
+        const dd = String(now.getDate()).padStart(2, "0");
+        // Thêm giờ phát sinh
+        const hh = String(now.getHours()).padStart(2, "0");
+        const min = String(now.getMinutes()).padStart(2, "0");
+
+        const formattedDateTime = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+
+        const ngayPSInput = document.getElementById("ngayPhatSinh");
+        const ngayCDInput = document.getElementById("ngayChiDinh");
+
+        if (ngayPSInput) {
+          ngayPSInput.value = formattedDateTime;
+        }
+
+        if (ngayCDInput) {
+          ngayCDInput.value = formattedDateTime;
+        }
+      }
+
+      // Hàm xử lý thời gian bắt đầu
+      // function startAutoTime() {
+      //   function update() {
+      //     setTodayDate();
+      //   }
+
+      //   update(); // chạy ngay
+      //   const now = new Date();
+      //   const delay = (60 - now.getSeconds()) * 1000;
+
+      //   setTimeout(() => {
+      //     update();
+      //     setInterval(update, 60000);
+      //   }, delay);
+      // }
+
+      let autoTimeInterval;
+      //Hàm xử lý thời gian bắt đầu
+      function startAutoTime() {
+        if (autoTimeInterval) return;
+        function update() {
+          setTodayDate();
+        }
+        update();
+        const now = new Date();
+        const delay = (60 - now.getSeconds()) * 1000;
+        setTimeout(() => {
+          update();
+          autoTimeInterval = setInterval(update, 60000);
+          setInterval(update, 60000);
+        }, delay);
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        loadHoTen();
+        loadBoPhan();
+
+        // Chạy hàm load động mã loại sự cố
+        loadLoaiSuCo();
+        // Chạy hàm load ngày mặc định theo hệ thống (tự động thay đổi theo giờ hệ thống)
+        startAutoTime();
+
+        document.getElementById("maSuCo").value = generateIncidentID();
+
+        // const today = new Date();
+        // const yyyy = today.getFullYear();
+        // const mm = String(today.getMonth() + 1).padStart(2, "0");
+        // const dd = String(today.getDate()).padStart(2, "0");
+
+        // const formattedDate = `${yyyy}-${mm}-${dd}`;
+
+        // const ngayPSInput = document.getElementById("ngayPhatSinh");
+        // const ngayCDInput = document.getElementById("ngayChiDinh");
+
+        // if (ngayPSInput) ngayPSInput.value = formattedDate;
+        // if (ngayCDInput) ngayCDInput.value = formattedDate;
+
+        document.getElementById("thoiGianXuLy").readOnly = true;
+        document.getElementById("thoiGianXuLy").style.backgroundColor =
+          "#f0f0f0";
+
+        checkITButton();
+        checkLogoutButton();
+      });
 
       // File upload handling
       const fileUpload = document.getElementById("fileUpload");
       const fileInput = document.getElementById("fileInput");
-      const fileList = document.getElementById("fileList");
+      const fileList = document.getElementById("fileListnguoiTiepNhan");
 
-      fileUpload.addEventListener("click", () => fileInput.click());
+      fileUpload.addEventListener("click", function () {
+        fileInput.click();
+      });
 
-      fileUpload.addEventListener("dragover", (e) => {
+      fileUpload.addEventListener("dragover", function (e) {
         e.preventDefault();
         fileUpload.classList.add("drag-over");
       });
 
-      fileUpload.addEventListener("dragleave", () => {
+      fileUpload.addEventListener("dragleave", function () {
         fileUpload.classList.remove("drag-over");
       });
 
-      fileUpload.addEventListener("drop", (e) => {
+      fileUpload.addEventListener("drop", function (e) {
         e.preventDefault();
         fileUpload.classList.remove("drag-over");
         handleFiles(e.dataTransfer.files);
       });
 
-      fileInput.addEventListener("change", (e) => {
+      fileInput.addEventListener("change", function (e) {
         handleFiles(e.target.files);
+      });
+
+      fileInput.addEventListener("change", function () {
+        const file = this.files[0];
+
+        if (!validateFile(file)) {
+          this.value = ""; // reset file
+          return;
+        }
+
+        console.log("✅ File hợp lệ:", file.name);
       });
 
       function handleFiles(files) {
         for (let file of files) {
           if (!CONFIG.ALLOWED_TYPES.includes(file.type)) {
-            alert(`File ${file.name} không được hỗ trợ!`);
+            alert("File " + file.name + " không được hỗ trợ!");
             continue;
           }
           if (file.size > CONFIG.MAX_FILE_SIZE) {
-            alert(`File ${file.name} vượt quá kích thước cho phép (10MB)!`);
+            alert(
+              "File " + file.name + " vượt quá kích thước cho phép (10MB)!",
+            );
             continue;
           }
           selectedFiles.push(file);
@@ -307,21 +1811,21 @@
 
       function displayFiles() {
         fileList.innerHTML = "";
-        selectedFiles.forEach((file, index) => {
+        selectedFiles.forEach(function (file, index) {
           const fileItem = document.createElement("div");
           fileItem.className = "file-item";
+
           fileItem.innerHTML = `
-                    <div class="file-item-info">
-                        <span class="file-item-icon">📄</span>
-                        <div>
-                            <div class="file-item-name">${file.name}</div>
-                            <div class="file-item-size">${formatFileSize(
-                              file.size,
-                            )}</div>
-                        </div>
-                    </div>
-                    <button type="button" class="remove-file" onclick="removeFile(${index})">✕ Xóa</button>
-                `;
+            <div class="file-item-content">
+              <span class="file-item-icon">📄</span>
+              <div class="file-item-info">
+                <div class="file-item-name">${file.name}</div>
+                <div class="file-item-size">${formatFileSize(file.size)}</div>
+              </div>
+            </div>
+            <button type="button" class="remove-file" onclick="removeFile(${index})">✕ Xóa</button>
+          `;
+
           fileList.appendChild(fileItem);
         });
       }
@@ -344,12 +1848,21 @@
       // Form submission
       document
         .getElementById("helpdeskForm")
-        .addEventListener("submit", async (e) => {
+        .addEventListener("submit", async function (e) {
           e.preventDefault();
-
+          const maBN = document.getElementById("maBenhNhan").value.trim();
+          const maNV = document.getElementById("maNhanVien").value.trim();
+          const tenNV = document.getElementById("nguoiBaoSuCo").value.trim();
           const submitBtn = document.getElementById("submitBtn");
           const loading = document.getElementById("loading");
           const message = document.getElementById("message");
+
+          if (!tenNV) {
+            alert("❌ Vui lòng nhập đúng tên nhân viên!");
+            submitBtn.disabled = false;
+            loading.classList.remove("active");
+            return;
+          }
 
           // Hiển thị trạng thái đang gửi
           submitBtn.disabled = true;
@@ -359,21 +1872,19 @@
           try {
             // Chuẩn bị dữ liệu
             const formData = {
-              // maSuCo: document.getElementById("maSuCo").value,
               ngayPhatSinh: document.getElementById("ngayPhatSinh").value,
               nguoiBaoSuCo: document.getElementById("nguoiBaoSuCo").value,
-              boPhan: document.getElementById("boPhan").value,
+              boPhan: document.getElementById("maKhoaPhong").value,
+              soDienThoai: document.getElementById("soDienThoai").value,
               loaiSuCo: document.getElementById("loaiSuCo").value,
-              mucDoUuTien: document.getElementById("mucDoUuTien").value,
               moTaSuCo: document.getElementById("moTaSuCo").value,
-              nguoiTiepNhan: document.getElementById("nguoiTiepNhan").value,
-              nguyenNhan: document.getElementById("nguyenNhan").value,
-              huongXuLy: document.getElementById("huongXuLy").value,
-              thoiGianBatDau: document.getElementById("thoiGianBatDau").value,
-              thoiGianHoanTat: document.getElementById("thoiGianHoanTat").value,
-              thoiGianXuLy: document.getElementById("thoiGianXuLy").value,
-              trangThai: document.getElementById("trangThai").value,
+              maBenhNhan: document.getElementById("maBenhNhan").value,
+              ngayChiDinh: document.getElementById("ngayChiDinh").value,
+              tenChiDinh: document.getElementById("tenChiDinh").value,
+              trangThai: "Chưa xử lý",
               ghiChu: document.getElementById("ghiChu").value,
+              maDanhMucSuCo:
+                document.getElementById("searchDanhMuc").value || "", // mã danh mục sự cố
               files: [],
             };
 
@@ -389,29 +1900,32 @@
 
             // GỌI HÀM TRỰC TIẾP TRÊN Code.gs
             google.script.run
-              .withSuccessHandler((res) => {
+              .withSuccessHandler(function (res) {
                 loading.classList.remove("active");
                 submitBtn.disabled = false;
 
-                // res là kết quả trả về từ hàm processForm ở backend
                 if (res.success) {
                   message.className = "message success active";
-                  message.textContent = `✅ Thành công! Mã sự cố: ${res.incidentId}`;
-                  setTimeout(() => {
-                    goToAdmin();
-                  }, 1500);
+                  message.textContent =
+                    "✅Đã gửi thành công! Mã sự cố: " + res.incidentId;
+
+                  // 🔁 Reload danh mục sự cố mới
+                  const loaiSelect = document.getElementById("loaiSuCo");
+                  if (loaiSelect && loaiSelect.value) {
+                    loaiSelect.dispatchEvent(new Event("change"));
+                  }
                 } else {
                   message.className = "message error active";
                   message.textContent = "❌ Lỗi: " + res.error;
                 }
               })
-              .withFailureHandler((err) => {
+              .withFailureHandler(function (err) {
                 loading.classList.remove("active");
                 submitBtn.disabled = false;
                 message.className = "message error active";
                 message.textContent = "❌ Lỗi hệ thống: " + err.message;
               })
-              .processForm(formData); // Gọi hàm processForm ở Code.gs
+              .processForm(formData);
           } catch (error) {
             console.error("Error:", error);
             loading.classList.remove("active");
@@ -421,20 +1935,262 @@
           }
         });
 
+      // Hàm chuyển file sang base64
       function fileToBase64(file) {
-        return new Promise((resolve, reject) => {
+        return new Promise(function (resolve, reject) {
           const reader = new FileReader();
           reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result.split(",")[1]);
-          reader.onerror = (error) => reject(error);
+          reader.onload = function () {
+            resolve(reader.result.split(",")[1]);
+          };
+          reader.onerror = function (error) {
+            reject(error);
+          };
         });
       }
 
-      function goToAdmin() {
-        window.top.location.href = CONFIG.SCRIPT_URL + "?page=admin";
+      // IIFE - Khởi tạo user
+      (function initUser() {
+        //const userStr = sessionStorage.getItem("user");
+        const userStr = localStorage.getItem("user");
+        const maNVWrapper = document.getElementById("maNVWrapper");
+        const maNVInput = document.getElementById("maNhanVien");
+        const tenNVInput = document.getElementById("nguoiBaoSuCo");
+        const maKhoaPhongInput = document.getElementById("maKhoaPhong");
+        const soDienThoaiInput = document.getElementById("soDienThoai");
+        const rowUserInfo = document.getElementById("rowUserInfo");
+
+        // CHƯA LOGIN
+        if (!userStr) {
+          console.log("🔓 Mode tự do (ko login)");
+          if (maNVWrapper) {
+            maNVWrapper.style.display = "none";
+          }
+          tenNVInput.readOnly = false;
+
+          maKhoaPhongInput.readOnly = false; // Phải = false để JS có thể gán giá trị
+          maKhoaPhongInput.style.backgroundColor = "#f0f0f0";
+          maKhoaPhongInput.style.pointerEvents = "none"; // Chặn user click/nhập
+          maKhoaPhongInput.style.cursor = "not-allowed";
+          maKhoaPhongInput.value = "";
+          return;
+        }
+
+        // ĐÃ LOGIN
+        try {
+          const user = JSON.parse(userStr);
+          if (maNVWrapper) {
+            maNVWrapper.style.display = "block";
+          }
+          if (user.role === "khach") {
+            maNVInput.value = user.username || "";
+            tenNVInput.value = user.fullName || "";
+            maKhoaPhongInput.value = user.department || "";
+
+            if (user.phone && soDienThoaiInput) {
+              soDienThoaiInput.value = user.phone;
+              soDienThoaiInput.readOnly = true;
+              soDienThoaiInput.style.backgroundColor = "#f0f0f0";
+            }
+
+            maNVInput.readOnly = true;
+            tenNVInput.readOnly = true;
+            maKhoaPhongInput.readOnly = true;
+            maNVInput.style.backgroundColor = "#f0f0f0";
+            tenNVInput.style.backgroundColor = "#f0f0f0";
+            maKhoaPhongInput.style.backgroundColor = "#f0f0f0";
+
+            setTimeout(loadLoaiSuCo, 200);
+            setTimeout(setTodayDate, 100);
+
+            console.log("✅ Login → hiện mã NV");
+          }
+        } catch (err) {
+          console.error("Session lỗi:", err);
+        }
+      })();
+
+      function checkITButton() {
+        const wrapper = document.getElementById("itAdminWrapper");
+        if (!wrapper) return;
+
+        //const userStr = sessionStorage.getItem("user");
+        const userStr = localStorage.getItem("user");
+
+        // Chưa login → hiện nút
+        if (!userStr) {
+          wrapper.style.display = "block";
+          return;
+        }
+        try {
+          const user = JSON.parse(userStr);
+
+          // Nếu là nhân viên BV → ẨN
+          if (user.role === "khach") {
+            wrapper.style.display = "none";
+          } else {
+            // Nếu là IT → vẫn hiện
+            wrapper.style.display = "block";
+          }
+        } catch (err) {
+          console.error("Session lỗi:", err);
+          wrapper.style.display = "block";
+        }
       }
 
-      document.getElementById("btnAdmin").addEventListener("click", goToAdmin);
+      function showRedirectButton(url) {
+        // Redirect tự động ngay lập tức
+        window.top.location.href = url;
+      }
+
+      // Chuyển hướng tới trang quản trị ticket
+      function goToAdmin() {
+        //const userStr = sessionStorage.getItem("user");
+        const userStr = localStorage.getItem("user");
+        google.script.run
+          .withSuccessHandler(function (url) {
+            let targetUrl;
+            if (!userStr) {
+              // Chưa login → chuyển đến trang login
+              targetUrl = url + "?page=login";
+            } else {
+              // Đã login → kiểm tra role (phân quyền) để chọn trang
+              const user = JSON.parse(userStr);
+              const targetPage =
+                user.role.toLowerCase() === "it" ? "admin" : "view";
+              targetUrl = url + "?page=" + targetPage;
+            }
+
+            // Redirect trực tiếp trong cùng tab (giống confirmLogoutAction thành công)
+            window.location.href = targetUrl;
+          })
+          .withFailureHandler(function (err) {
+            console.error("Lỗi lấy URL:", err);
+            alert("Không thể chuyển trang. Vui lòng thử lại!");
+          })
+          .getWebAppUrl();
+      }
+
+      // HÀM ĐĂNG XUẤT TÀI KHOẢN
+      function handleLogout() {
+        const confirmLogout = confirm("🔒 Bạn có chắc muốn đăng xuất?");
+        if (!confirmLogout) return;
+
+        //sessionStorage.removeItem("user");
+        localStorage.removeItem("user");
+
+        // Hiển thị overlay loading ngắn (ko thay body, giữ gesture)
+        const overlay = document.createElement("div");
+        overlay.style.cssText = `
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 1.3rem;
+          z-index: 999999;
+          backdrop-filter: blur(4px);
+        `;
+        overlay.innerHTML = `
+          <div style="text-align:center;">
+            <div style="
+              border: 6px solid rgba(255,255,255,0.3);
+              border-top: 6px solid white;
+              border-radius: 50%;
+              width: 50px;
+              height: 50px;
+              animation: spin 1s linear infinite;
+              margin: 0 auto 15px;
+            "></div>
+            <p>Đang đăng xuất</p>
+          </div>
+          <style>
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          </style>
+        `;
+        document.body.appendChild(overlay);
+
+        google.script.run
+          .withSuccessHandler(function (url) {
+            // Redirect ngay bằng location.href (giống confirmLogoutAction thành công)
+            setTimeout(() => {
+              window.location.href = url + "?page=login";
+            }, 500); // Delay ngắn để thấy overlay, nhưng vẫn trong user gesture
+          })
+          .withFailureHandler(function () {
+            // Nếu lỗi lấy URL, xóa overlay và thông báo
+            if (overlay.parentNode) overlay.remove();
+            //alert("Đăng xuất thành công! Vui lòng tải lại trang để đăng nhập lại.");
+            location.reload();
+          })
+          .getWebAppUrl();
+      }
+
+      // KIỂM TRA HIỂN THỊ NÚT ĐĂNG XUẤT
+      function checkLogoutButton() {
+        const logoutWrapper = document.getElementById("logoutWrapper");
+        if (!logoutWrapper) return;
+
+        // const userStr = sessionStorage.getItem("user");
+        const userStr = localStorage.getItem("user");
+
+        // Nếu đã login → HIỆN nút đăng xuất
+        if (userStr) {
+          try {
+            const user = JSON.parse(userStr);
+            if (user.role) {
+              logoutWrapper.style.display = "block";
+            }
+          } catch (err) {
+            console.error("Session lỗi:", err);
+            logoutWrapper.style.display = "none";
+          }
+        } else {
+          // Chưa login → ẨN nút
+          logoutWrapper.style.display = "none";
+        }
+      }
+
+      // KIỂM TRA FILE ĐÍNH KÈM HỢP LÊ KO
+      function validateFile(file) {
+        if (!file) return true;
+        // 1. Check size
+        if (file.size > CONFIG.MAX_FILE_SIZE) {
+          alert("❌ File đính kèm vượt quá 10MB!");
+          return false;
+        }
+
+        // 2. Check MIME type
+        if (!CONFIG.ALLOWED_TYPES.includes(file.type)) {
+          alert("❌ Loại file không được hỗ trợ!");
+          return false;
+        }
+
+        // 3. Check extension (chống fake MIME)
+        const ext = file.name.split(".").pop().toLowerCase();
+        if (!CONFIG.ALLOWED_EXTENSIONS.includes(ext)) {
+          alert("❌ Định dạng file không hợp lệ!");
+          return false;
+        }
+
+        // 4. Check tên file (tránh ký tự nguy hiểm)
+        const invalidChars = /[<>:"/\\|?*\x00-\x1F]/g;
+        if (invalidChars.test(file.name)) {
+          alert("❌ Tên file chứa ký tự không hợp lệ!");
+          return false;
+        }
+        return true;
+      }
+
+      function initCreatePage() {
+        checkITButton(); // Thêm dòng này để ẩn nút IT nếu role = khach
+        checkLogoutButton(); // Đảm bảo nút logout hiển thị đúng
+      }
     </script>
   </body>
 </html>

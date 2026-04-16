@@ -233,6 +233,32 @@ input[type="file"] {
   margin: 0 auto 10px;
 }
 
+/* Style cho khối bổ sung */
+#extraInfoFields {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition:
+    max-height 0.5s cubic-bezier(0, 1, 0, 1),
+    opacity 0.3s ease; /* Hiệu ứng mượt */
+  background: #f8f9fa;
+  padding: 0 15px;
+  border-radius: 8px;
+  border-left: 5px solid #2196f3;
+  margin-top: 10px;
+}
+
+/* Class này sẽ được thêm bằng JS khi click */
+#extraInfoFields.is-visible {
+  max-height: 1000px; /* Đủ lớn để chứa nội dung bên trong */
+  opacity: 1;
+  padding: 15px; /* Hiện lại padding khi mở */
+  margin-bottom: 20px;
+  transition:
+    max-height 0.8s ease-in-out,
+    opacity 0.5s ease;
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);

@@ -4,61 +4,1088 @@
     <meta charset="UTF-8" />
     <title>Quản Lý Ticket - CNTT</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./style.css" />
+    <meta
+      http-equiv="Cache-Control"
+      content="no-cache, no-store, must-revalidate"
+    />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <base target="_top" />
+
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, sans-serif;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        margin: 0;
+        padding: 20px;
+        overflow-x: hidden;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: auto;
+      }
+
+      h1 {
+        color: #333;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      /* Card Header tổng thể */
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: nowrap;
+        gap: 15px;
+        background: #ffffff;
+        padding: 15px 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
+      }
+
+      .dashboard-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      }
+
+      /* TITLE */
+      .dashboard-card h1 {
+        font-size: 22px;
+        margin-bottom: 6px;
+      }
+
+      .dashboard-card p {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+
+      .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+
+        gap: 15px;
+        background: #fff;
+
+        padding: 16px 20px;
+        border-radius: 14px;
+
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+        margin-bottom: 20px;
+      }
+
+      /* Nhóm bộ lọc */
+      .filter-group {
+        display: flex;
+        flex: 1; /* Chiếm bên trái */
+        min-width: 0; /* Fix overflow */
+        flex-wrap: nowrap; /* wrap ko xuống dòng */
+        gap: 12px;
+        align-items: center;
+        overflow-x: auto; /* scroll ngang nếu quá nhiều filter */
+        padding-bottom: 8px; /* tránh cắt scrollbar */
+      }
+
+      .filter-control {
+        height: 40px;
+        padding: 0 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: #f8fafc;
+        font-size: 14px;
+        color: #334155;
+        transition: 0.2s;
+        width: 170px;
+        min-width: 170px;
+      }
+
+      .filter-control:hover {
+        border-color: #94a3b8;
+        background-color: #ffffff;
+      }
+
+      .filter-control:focus {
+        outline: none;
+        border-color: #6366f1;
+        background: #ffffff;
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+      }
+
+      .date-input {
+        cursor: pointer;
+        text-transform: uppercase;
+      }
+
+      /* Kiểu dáng cho các ô Select và Input */
+      .filter-group select,
+      .filter-group input {
+        padding: 0 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #333;
+        outline: none;
+        background-color: #f9f9f9;
+        transition: all 0.3s ease;
+        width: 180px !important;
+        min-width: 180px !important;
+        max-width: 180px !important;
+      }
+
+      .filter-group select:focus,
+      .filter-group input:focus {
+        border-color: #667eea;
+        background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      #filterTicketCode {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0 10px;
+      }
+
+      /* Nhóm nút bấm */
+      .card-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+      }
+
+      .card-actions button {
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: none;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .btn-refresh {
+        background: #f1f5f9;
+        color: #333;
+      }
+
+      .btn-refresh:hover {
+        background: #e2e8f0;
+      }
+
+      .btn-create {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+      }
+
+      .btn-create:hover {
+        opacity: 0.9;
+      }
+
+      #mPhone {
+        background-color: #f0f0f0;
+        cursor: default;
+        font-weight: 600;
+      }
+
+      #mPhone::placeholder {
+        color: #9ca3af;
+        font-weight: normal;
+      }
+
+      /* Responsive cho điện thoại */
+      @media (max-width: 768px) {
+        /* Không cho tràn màn */
+        * {
+          box-sizing: border-box;
+        }
+        .card-header {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 16px;
+          width: 100%;
+        }
+
+        /* FILTER: GRID 2 CỘT */
+        .filter-group {
+          display: grid;
+          grid-template-columns: repeat(1, minmax(0, 1fr));
+          gap: 12px;
+          width: 100%;
+        }
+
+        .filter-group input {
+          margin: 0 !important;
+        }
+
+        .filter-control,
+        .filter-group select,
+        .filter-group input {
+          width: 100% !important;
+          min-width: 0 !important;
+          max-width: 100% !important;
+          box-sizing: border-box;
+        }
+        .filter-control {
+          width: 100%;
+          min-width: 0;
+        }
+
+        .dashboard-card {
+          padding: 18px;
+        }
+        .dashboard-card h1 {
+          font-size: 18px;
+        }
+        .dashboard-header {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .card-actions {
+          flex-direction: column;
+          width: 100%;
+          gap: 10px;
+        }
+
+        /* Button full */
+        .card-actions button {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .card-actions button:first-child {
+          margin-top: 0 !important;
+        }
+
+        .user-menu,
+        .user-name {
+          width: 100%;
+          justify-content: center;
+        }
+        .stats {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
+        }
+        .stat {
+          min-height: 80px;
+          padding: 12px;
+        }
+        .stat span {
+          font-size: 20px;
+        }
+
+        .modal {
+          padding: 0;
+          align-items: flex-end; /* modal từ dưới lên */
+          background: rgba(0, 0, 0, 0.6);
+        }
+
+        /* Fix modal header cho mọi kích thước màn hình */
+        .modal-header {
+          padding: 14px 16px !important;
+        }
+
+        .modal-header h3 {
+          font-size: 1.18rem !important;
+        }
+
+        .modal-header button {
+          font-size: 32px !important;
+          margin-right: -4px !important;
+          padding: 0 8px;
+        }
+
+        .modal-header button:hover {
+          opacity: 0.8;
+        }
+
+        /* Đảm bảo modal-content không bị padding thừa làm lệch header */
+
+        .modal-content {
+          width: 100%;
+          max-width: 100%;
+          height: 92vh;
+          max-height: 94vh;
+          border-radius: 16px 16px 0 0;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .modal-body {
+          display: grid;
+          grid-template-columns: 1fr !important; /* dùng !important để ghi đè */
+          padding: 16px 14px !important;
+          gap: 14px !important;
+          overflow-y: auto;
+          overflow-x: hidden;
+        }
+
+        /* Tối ưu form group */
+        .form-group {
+          grid-column: 1 / -1 !important; /* tất cả form-group đều full width trên mobile */
+          gap: 4px; /* Giảm khoảng cách label-input */
+        }
+
+        .form-group label {
+          font-size: 12px; /* Giảm size label */
+        }
+
+        .modal-body input,
+        .modal-body select,
+        .modal-body textarea {
+          padding: 10px 12px;
+          font-size: 14px; /* Giảm font size */
+        }
+
+        .modal-body textarea {
+          height: 70px; /* Giảm chiều cao textarea */
+          min-height: 60px;
+        }
+
+        /* Footer cố định dưới cùng */
+        .modal-footer {
+          padding: 14px 16px;
+          gap: 10px;
+          flex-direction: row;
+        }
+
+        .modal-footer .btn {
+          flex: 1;
+          min-height: 44px; /* Dễ bấm ngón tay */
+          font-size: 14px;
+        }
+
+        /* Full width cho các field chiếm 1 dòng */
+        .full-width {
+          grid-column: 1 / -1 !important;
+        }
+
+        /* Custom scrollbar mobile */
+        .modal-body::-webkit-scrollbar {
+          width: 4px; /* Mỏng hơn trên mobile */
+        }
+      }
+
+      @media (max-width: 480px) {
+        /* ===== DASHBOARD ===== */
+        .stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .stat {
+          font-size: 13px;
+        }
+        .stat span {
+          font-size: 20px;
+        }
+        /* ===== FILTER ===== */
+        .filter-group select {
+          flex: 1 1 100%;
+        }
+        .card-actions {
+          flex-direction: column;
+        }
+        .card-actions,
+        .user-menu {
+          width: 100%;
+          justify-content: center;
+        }
+        .card-actions button {
+          width: 100%;
+        }
+        .user-menu {
+          width: 100%;
+        }
+        .user-name {
+          width: 100%;
+          max-width: 220px;
+          justify-content: center;
+          padding: 6px 0 !important;
+          font-size: 13px;
+        }
+        #username {
+          max-width: 100px;
+        }
+
+        /* ===== MODAL MOBILE ===== */
+        .modal {
+          padding: 0;
+          align-items: flex-end;
+        }
+
+        .modal-content {
+          width: 100%;
+          max-width: 100%;
+          height: 94vh;
+          max-height: 94vh;
+
+          border-radius: 18px 18px 0 0;
+
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* HEADER */
+        .modal-header {
+          padding: 12px 14px;
+        }
+
+        .modal-header h3 {
+          font-size: 1.1 rem;
+        }
+
+        /* BODY */
+        .modal-body {
+          padding: 14px 12px !important;
+          gap: 12px !important;
+          overflow-y: auto;
+          overflow-x: hidden;
+        }
+
+        .form-group label {
+          font-size: 12.5px;
+        }
+
+        .modal-body input,
+        .modal-body select,
+        .modal-body textarea {
+          font-size: 13.5px;
+          padding: 9px 11px;
+        }
+
+        .modal-body textarea {
+          height: 64px;
+        }
+
+        .full-width {
+          grid-column: span 1;
+        }
+
+        /* FOOTER */
+        .modal-footer {
+          padding: 12px 14px;
+          gap: 8px;
+        }
+
+        .btn {
+          /* flex: 1;
+          justify-content: center; */
+          font-size: 13.5px;
+          padding: 11px;
+        }
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 15px;
+      }
+
+      .stat {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+        border-radius: 12px;
+        padding: 18px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        min-height: 90px;
+
+        transition: all 0.25s ease;
+        cursor: pointer;
+      }
+
+      .stat span {
+        font-size: 26px;
+        font-weight: 700;
+        margin-top: 6px;
+      }
+
+      .stat:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+      }
+
+      select,
+      button {
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+      }
+
+      button {
+        background: #667eea;
+        color: #fff;
+        cursor: pointer;
+        border: none;
+      }
+
+      .ticket {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        background: #f9f9f9;
+      }
+
+      .ticket:hover {
+        border-color: #667eea;
+      }
+
+      /* ===== STATUS BADGE (FIX CHUẨN) ===== */
+      .status {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        color: #fff;
+        display: inline-block;
+      }
+
+      .status-new {
+        background: #f1c40f;
+        color: #333;
+      }
+
+      .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .status-waiting {
+        background: #ffedd5;
+        color: #9a3412;
+      }
+
+      .status-processing {
+        background: #e0f2fe;
+        color: #0369a1;
+      }
+
+      .status-cancel {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      .status-done {
+        background: #dcfce7;
+        color: #166534;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.7); /* Màu tối sang trọng hơn */
+        backdrop-filter: blur(4px); /* Làm mờ nền phía sau */
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        transition: all 0.3s ease;
+        padding: 20px;
+      }
+
+      .modal.active {
+        display: flex;
+        opacity: 1;
+      }
+
+      .modal-content {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 0;
+        width: 95%;
+        max-width: 650px;
+        max-height: 90vh; /* Giới hạn chiều cao tối đa 90% viewport */
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column; /* Quan trọng để body có thể scroll */
+      }
+
+      .modal.active .modal-content {
+        transform: translateY(0);
+      }
+
+      /* Header Modal */
+      .modal-header {
+        background: #f8fafc;
+        padding: 20px 25px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0; /* Không cho header co lại */
+      }
+
+      .modal-header h3 {
+        margin: 0;
+        color: #1e293b;
+        font-size: 1.25rem;
+        font-weight: 700;
+      }
+
+      /* Body Modal */
+      .modal-body {
+        padding: 25px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        overflow-y: auto; /* Cho phép scroll */
+        flex: 1; /* Chiếm không gian còn lại */
+      }
+
+      /* Custom scrollbar cho modal body */
+      .modal-body::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .modal-body::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+      }
+
+      .modal-body::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+      }
+
+      .modal-body::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      /* Các ô nhập liệu chiếm toàn chiều ngang */
+      .full-width {
+        grid-column: span 2;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .form-group label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #64748b;
+        margin-left: 2px;
+      }
+
+      .modal-body input,
+      .modal-body select,
+      .modal-body textarea {
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        font-size: 14px;
+        color: #334155;
+        transition: all 0.2s;
+        box-sizing: border-box;
+      }
+
+      .modal-body input:focus,
+      .modal-body select:focus,
+      .modal-body textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+      }
+
+      .modal-body textarea {
+        height: 80px;
+        resize: vertical;
+      }
+
+      /* Footer Modal */
+      .modal-footer {
+        padding: 15px 25px;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        flex-shrink: 0; /* Không cho footer co lại */
+      }
+
+      /* Button chuyên nghiệp */
+      .btn {
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-save {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+      }
+
+      .btn-save:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3);
+      }
+
+      .btn-close {
+        background: #e2e8f0;
+        color: #475569;
+      }
+
+      .btn-close:hover {
+        background: #cbd5e1;
+      }
+
+      /* ===== USER DROPDOWN ===== */
+      .user-menu {
+        position: relative;
+        font-family: "Segoe UI", Roboto, sans-serif;
+      }
+
+      .user-name {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 12px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+
+        max-width: 100%;
+        overflow: hidden;
+        min-width: 0;
+      }
+
+      .user-name:hover {
+        background: #eef2ff;
+      }
+
+      #username {
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .user-dropdown {
+        position: absolute;
+        right: 0;
+        top: 110%;
+        width: 200px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        display: none;
+        overflow: hidden;
+        z-index: 999;
+      }
+
+      .user-dropdown.active {
+        display: block;
+      }
+
+      .user-info-header {
+        padding: 14px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff;
+        font-size: 13px;
+      }
+
+      .user-info-header div:last-child {
+        margin-top: 4px;
+        font-weight: bold;
+      }
+
+      #userRole {
+        font-size: 14px;
+        font-weight: 700;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      /* Thêm icon nhỏ trước chữ IT cho xịn */
+      #userRole::before {
+        content: "🛡️";
+        font-size: 12px;
+      }
+
+      .user-dropdown hr {
+        margin: 0;
+        border: none;
+        border-top: 1px solid #f1f5f9;
+      }
+
+      /* LOGOUT */
+      .logout-btn {
+        padding: 12px 14px;
+        cursor: pointer;
+        background: #fff;
+        transition: background 0.2s;
+      }
+
+      .logout-btn:hover {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+
+      /* Overlay làm mờ nền */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.6); /* Màu tối sang trọng */
+        backdrop-filter: blur(4px); /* Làm mờ nền phía sau */
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: all 0.3s ease;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+        animation: fadeIn 0.2s ease-out;
+      }
+
+      /* Card chính */
+      .modal-confirm-card {
+        background: white;
+        width: 90%;
+        max-width: 380px;
+        padding: 32px;
+        border-radius: 24px;
+        box-shadow:
+          0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        text-align: center;
+        transform: scale(0.9);
+        transition: transform 0.2s ease;
+      }
+
+      .modal-overlay.active .modal-confirm-card {
+        transform: scale(1);
+      }
+
+      /* Icon vòng tròn */
+      .icon-circle {
+        width: 64px;
+        height: 64px;
+        background: #fef2f2;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        margin: 0 auto 20px;
+      }
+
+      /* Typography */
+      .modal-confirm-content h3 {
+        margin: 0 0 8px;
+        color: #1e293b;
+        font-size: 20px;
+        font-weight: 700;
+      }
+
+      .modal-confirm-content p {
+        color: #64748b;
+        font-size: 15px;
+        line-height: 1.5;
+        margin-bottom: 28px;
+      }
+
+      /* Nút bấm */
+      .modal-confirm-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .btn-cancel,
+      .btn-confirm {
+        padding: 12px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+      }
+
+      .btn-cancel {
+        background: #f1f5f9;
+        color: #475569;
+      }
+
+      .btn-cancel:hover {
+        background: #e2e8f0;
+      }
+
+      .btn-confirm {
+        background: #ef4444;
+        color: white;
+      }
+
+      .btn-confirm:hover {
+        background: #dc2626;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      /* Ẩn input ID nhưng vẫn đẹp */
+      #mMa {
+        background: #f1f5f9;
+        cursor: not-allowed;
+        font-weight: 700;
+        color: #64748b;
+      }
+      textarea,
+      input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+      }
+    </style>
   </head>
 
   <body>
     <div class="container">
-      <div class="card">
-        <h1>🎫 Quản Lý Ticket - Phòng CNTT</h1>
+      <div class="card dashboard-card">
+        <h1>🎫 Quản lý ticket - Phòng CNTT</h1>
         <p>Xem và cập nhật trạng thái các yêu cầu hỗ trợ</p>
-
         <div class="stats">
-          <div class="stat">Tổng<br /><span id="statTotal">0</span></div>
-          <div class="stat">Mới<br /><span id="statNew">0</span></div>
           <div class="stat">
-            Đang xử lý<br /><span id="statProcessing">0</span>
+            Tổng
+            <span id="statTotal">0</span>
           </div>
-          <div class="stat">Hoàn tất<br /><span id="statDone">0</span></div>
+          <div class="stat">
+            Chưa xử lý
+            <span id="statPending">0</span>
+          </div>
+          <div class="stat">
+            Đang xử lý
+            <span id="statProcessing">0</span>
+          </div>
+          <div class="stat">
+            Hoàn tất
+            <span id="statDone">0</span>
+          </div>
         </div>
       </div>
 
       <div class="card card-header">
+        <!-- FILTER -->
         <div class="filter-group">
-          <select id="filterStatus" onchange="renderTickets()">
+          <input
+            type="date"
+            id="filterDate"
+            class="filter-control date-input"
+            onchange="renderTickets()"
+          />
+          <select
+            id="filterStatus"
+            class="filter-control"
+            onchange="renderTickets()"
+          >
             <option value="">🎯 Tất cả trạng thái</option>
-            <option value="Mới">Mới</option>
-            <option value="Đang xử lý">Đang xử lý</option>
-            <option value="Hoàn tất">Hoàn tất</option>
-            <option value="Đóng">Đóng</option>
+            <!-- <option value="Chưa xử lý">🟡 Chưa xử lý</option>
+            <option value="Chờ xử lý">🟠 Chờ xử lý</option>
+            <option value="Đang xử lý">🔵 Đang xử lý</option>
+            <option value="Hoàn tất">🟢 Hoàn tất</option> -->
           </select>
 
-          <!-- <input type="date" id="filterDate" onchange="renderTickets()" title="Lọc theo ngày phát sinh" /> -->
-
-          <select id="filterPriority" onchange="renderTickets()">
-            <option value="">⚡ Mức độ ưu tiên</option>
-            <option value="P1 - Khẩn cấp">P1 - Khẩn cấp</option>
-            <option value="P2 - Cao">P2 - Cao</option>
-            <option value="P3 - Thường">P3 - Thường</option>
-          </select>
-
-          <select id="filterType" onchange="renderTickets()">
+          <select
+            id="filterType"
+            class="filter-control"
+            onchange="renderTickets()"
+          >
             <option value="">📂 Loại sự cố</option>
-            <option value="HIS">HIS</option>
-            <option value="BIS">BIS</option>
-            <option value="RIS">RIS</option>
-            <option value="LIS">LIS</option>
-            <option value="PHIS">PHIS</option>
           </select>
+
+          <!-- Search ticket by id -->
+          <input
+            type="text"
+            id="filterTicketCode"
+            class="filter-control"
+            placeholder="🔎 Tìm theo mã sự cố..."
+            oninput="renderTickets()"
+            style="min-width: 220px"
+          />
+
+          <!-- Tìm ticket theo mã phòng của nhân viên báo cáo sự cố -->
+          <input
+            type="text"
+            id="filterKhoaPhongTen"
+            class="filter-control"
+            placeholder="🔎 Tên khoa/phòng"
+            oninput="renderTickets()"
+            list="khoaPhongSuggestions"
+            autocomplete="off"
+            style="min-width: 220px"
+          />
         </div>
 
+        <!-- ACTIONS -->
         <div class="card-actions">
-          <button class="btn-refresh" onclick="loadTickets()">
+          <button
+            style="margin: 0 !important"
+            class="btn-refresh"
+            onclick="loadTickets()"
+          >
             🔄 Làm mới
           </button>
-          <button class="btn-create" onclick="goToCreate()">
-            ➕ Tạo ticket
-          </button>
+          <!-- USER -->
+          <div class="user-menu">
+            <div class="user-name" onclick="toggleUserMenu()">
+              👤 <span id="username">IT user</span>
+              <span class="arrow">▼</span>
+            </div>
+            <div class="user-dropdown" id="userDropdown">
+              <div class="user-info-header">
+                <div>Phiên đăng nhập</div>
+                <div id="userRole">IT</div>
+              </div>
+              <div class="logout-btn" onclick="logout()">🚪 Đăng xuất</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -69,10 +1096,11 @@
     <div class="modal" id="modal">
       <div class="modal-content">
         <div class="modal-header">
-          <h3>🎫 Cập nhật Ticket</h3>
+          <h3 id="modal-title">🎫 Cập nhật Ticket</h3>
           <button
             onclick="closeModal()"
             style="
+              width: auto !important;
               background: none;
               border: none;
               font-size: 20px;
@@ -91,18 +1119,54 @@
           </div>
           <div class="form-group">
             <label>Trạng thái xử lý</label>
-            <select id="mStatus">
-              <option value="Mới">🟡 Mới</option>
-              <option value="Đang xử lý">🔵 Đang xử lý</option>
-              <option value="Hoàn tất">🟢 Hoàn tất</option>
-            </select>
+            <select id="mStatus"></select>
+          </div>
+
+          <!-- Người tiếp nhận -->
+          <div class="form-group">
+            <label>Người tiếp nhận</label>
+            <input
+              type="text"
+              id="mAssignee"
+              readonly
+              style="background: #f3f4f6; cursor: not-allowed"
+            />
+          </div>
+
+          <!-- Thời gian bắt đầu -->
+          <div class="form-group">
+            <label>Thời gian bắt đầu xử lý</label>
+            <input type="datetime-local" id="mStartTime" />
+          </div>
+
+          <!-- Thời gian kết thúc -->
+          <div class="form-group">
+            <label>Thời gian hoàn tất</label>
+            <input type="datetime-local" id="mEndTime" />
+          </div>
+
+          <!-- Tổng thời gian -->
+          <div class="form-group">
+            <label>Tổng thời gian (phút)</label>
+            <input id="mTotalTime" readonly />
+          </div>
+
+          <!-- ✅ SỐ ĐIỆN THOẠI NGƯỜI BÁO CÁO -->
+          <div class="form-group">
+            <label>📱 Số điện thoại liên hệ</label>
+            <input
+              id="mPhone"
+              readonly
+              placeholder="Chưa có số điện thoại"
+              style="background-color: #f0f0f0; cursor: default"
+            />
           </div>
 
           <div class="form-group full-width">
             <label>Nguyên nhân sự cố</label>
             <textarea
               id="mNguyenNhan"
-              placeholder="Nhập nguyên nhân tìm thấy..."
+              placeholder="Nhập nguyên nhân phát sinh..."
             ></textarea>
           </div>
 
@@ -110,17 +1174,25 @@
             <label>Hướng xử lý / Kết quả</label>
             <textarea
               id="mXuLy"
-              placeholder="Nội dung đã xử lý cho khách hàng..."
+              placeholder="Nội dung xử lý cho bệnh nhân..."
             ></textarea>
           </div>
 
-          <div class="form-group">
-            <label>Thời gian xử lý (phút)</label>
-            <input id="mTime" type="number" placeholder="Ví dụ: 30" />
+          <div class="form-group full-width">
+            <label>File đính kèm</label>
+            <div
+              id="mFilePreview"
+              style="margin-top: 8px; text-align: center"
+            ></div>
+            <!-- <input type="file" id="mFileInput" accept="image/*" style="margin-top:8px"/> -->
           </div>
-          <div class="form-group">
-            <label>Ghi chú thêm</label>
-            <input id="mNote" type="text" placeholder="Ghi chú nội bộ..." />
+
+          <div class="form-group full-width">
+            <label>Ghi chú nội bộ</label>
+            <textarea
+              id="mNote"
+              placeholder="Chỉ dành cho bộ phận IT..."
+            ></textarea>
           </div>
         </div>
 
@@ -131,56 +1203,645 @@
       </div>
     </div>
 
+    <div id="logoutModal" class="modal-overlay">
+      <div class="modal-confirm-card">
+        <div class="modal-confirm-icon">
+          <div class="icon-circle">⚠️</div>
+        </div>
+
+        <div class="modal-confirm-content">
+          <h3>Đăng xuất tài khoản</h3>
+          <p>
+            Phiên làm việc của bạn sẽ kết thúc. Bạn có chắc chắn muốn rời khỏi
+            hệ thống không?
+          </p>
+        </div>
+
+        <div class="modal-confirm-actions">
+          <button class="btn-cancel" onclick="closeLogoutModal()">
+            Hủy bỏ
+          </button>
+          <button class="btn-confirm" onclick="confirmLogoutAction()">
+            Đăng xuất
+          </button>
+        </div>
+      </div>
+    </div>
+
     <script>
+      let autoReloadTimer = null;
+      let lastTicketHash = "";
+
       let tickets = [];
       let current = null;
+      window.currentUser = null;
+
+      let khoaPhongMap = {};
+      let khoaPhongMapNoDiacritics = {};
+
+      let khoaPhongNames = [];
+
+      function removeVietnameseTones(str) {
+        if (!str) return "";
+        return str
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/đ/g, "d")
+          .replace(/Đ/g, "D")
+          .toLowerCase()
+          .trim();
+      }
+
+      function loadKhoaPhongMap() {
+        google.script.run
+          .withSuccessHandler(function (map) {
+            khoaPhongMap = map || {};
+
+            // Tạo map không dấu để tìm kiếm
+            khoaPhongMapNoDiacritics = {};
+            Object.keys(map).forEach((ma) => {
+              const ten = map[ma];
+              if (ten) {
+                khoaPhongMapNoDiacritics[ma] = removeVietnameseTones(ten);
+              }
+            });
+
+            // Gợi ý tên (có dấu) cho datalist
+            const datalist = document.getElementById("khoaPhongSuggestions");
+            if (datalist) {
+              datalist.innerHTML = "";
+              const uniqueNames = [...new Set(Object.values(map))];
+              uniqueNames.forEach((name) => {
+                const option = document.createElement("option");
+                option.value = name;
+                datalist.appendChild(option);
+              });
+            }
+          })
+          .withFailureHandler(function (err) {
+            console.error("Lỗi load map khoa phòng:", err);
+          })
+          .getKhoaPhongMap();
+      }
+
+      function normalizeStatus(status) {
+        if (!status) return "";
+        return status
+          .toString()
+          .replace(/[🟡🟠🔵🔴🟢]/g, "") // bỏ emoji
+          .trim()
+          .toLowerCase();
+      }
+
+      // Redirect lại trang login
+      function redirectLogin() {
+        google.script.run
+          .withSuccessHandler(function (url) {
+            document.body.innerHTML = `
+              <div style="
+                display:  flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+                font-family: sans-serif;
+              ">
+                <div style="
+                  background:white;
+                  padding:40px;
+                  border-radius:20px;
+                  text-align:center;
+                  box-shadow:0 20px 40px rgba(0,0,0,0.2);
+                ">
+                  <h2>🔐 Phiên đăng nhập hết hạn</h2>
+                  <p>Vui lòng đăng nhập lại để tiếp tục</p>
+                  <a href="${url}?page=login" target="_top"
+                    style="
+                      display:inline-block;
+                      margin-top:20px;
+                      padding:12px 24px;
+                      background:#6366f1;
+                      color:white;
+                      border-radius:10px;
+                      text-decoration:none;
+                      font-weight:600;
+                    ">
+                    Đăng nhập lại
+                  </a>
+                </div>
+              </div>
+            `;
+          })
+          .getWebAppUrl();
+      }
+
+      function getNowDateTimeLocal() {
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, "0");
+        const dd = String(now.getDate()).padStart(2, "0");
+        const hh = String(now.getHours()).padStart(2, "0");
+        const mi = String(now.getMinutes()).padStart(2, "0");
+        return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+      }
+
+      (function checkAccess() {
+        //const userStr = sessionStorage.getItem("user");
+        const userStr = localStorage.getItem("user");
+        const urlParams = new URLSearchParams(window.location.search);
+        const page = urlParams.get("page");
+
+        // Nếu truy cập trang admin/view mà không có thông tin login trong session
+        if ((page === "admin" || page === "view") && !userStr) {
+          alert("Vui lòng đăng nhập để tiếp tục!");
+          google.script.run
+            .withSuccessHandler(function (url) {
+              window.location.href = url + "?page=login";
+            })
+            .getWebAppUrl();
+        }
+      })();
+
+      (function checkLoginOnLoad() {
+        const userStr = localStorage.getItem("user");
+        if (!userStr) {
+          console.warn("❌ Chưa login → về login");
+          google.script.run
+            .withSuccessHandler(function (url) {
+              window.location.href = url + "?page=login";
+            })
+            .getWebAppUrl();
+          return;
+        }
+
+        try {
+          const user = JSON.parse(userStr);
+          if (!user.role || user.role.toLowerCase() !== "it") {
+            console.warn("❌ Không phải IT");
+            google.script.run
+              .withSuccessHandler(function (url) {
+                window.location.href = url + "?page=login";
+              })
+              .getWebAppUrl();
+            return;
+          }
+
+          console.log("✅ Auto login OK:", user.username);
+        } catch (err) {
+          console.error("Parse lỗi:", err);
+          localStorage.removeItem("user");
+        }
+      })();
+
+      // Thêm hàm này để đóng/mở menu người dùng
+      function toggleUserMenu() {
+        const menu = document.getElementById("userDropdown");
+        if (menu) {
+          menu.style.display =
+            menu.style.display === "block" ? "none" : "block";
+        }
+      }
+
+      // Thêm logic click ra ngoài để đóng menu (tùy chọn nhưng nên có)
+      document.addEventListener("click", function (e) {
+        const menu = document.getElementById("userDropdown");
+        const userMenuContainer = document.querySelector(".user-menu");
+
+        if (
+          menu &&
+          userMenuContainer &&
+          !userMenuContainer.contains(e.target)
+        ) {
+          menu.style.display = "none";
+        }
+      });
+
+      // Chống vào thẳng admin khi chưa login
+      (function checkAuth() {
+        //const userStr = sessionStorage.getItem("user");
+        const userStr = localStorage.getItem("user");
+
+        // Nếu không tìm thấy thông tin user trong bộ nhớ -> quay về login
+        if (!userStr) {
+          document.body.innerHTML = `
+            <div style="
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              height: 100vh;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              font-family: 'Inter', system-ui, -apple-system, sans-serif;
+              margin: 0;
+            ">
+              <div style="
+                background: white;
+                padding: 40px;
+                border-radius: 24px;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+                text-align: center;
+                max-width: 400px;
+                width: 90%;
+                animation: slideUp 0.5s ease-out;
+              ">
+                <div style="
+                  font-size: 64px;
+                  margin-bottom: 20px;
+                  display: inline-block;
+                  background: #fff1f2;
+                  width: 100px;
+                  height: 100px;
+                  line-height: 100px;
+                  border-radius: 50%;
+                ">🔐</div>
+
+                <h2 style="color: #1e293b; margin: 0 0 10px 0; font-size: 24px; font-weight: 700;">Phiên đăng nhập hết hạn</h2>
+
+                <p style="color: #64748b; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+                  Để bảo mật thông tin, hệ thống đã tự động đăng xuất. Vui lòng đăng nhập lại để tiếp tục!
+                </p>
+
+                <button onclick="redirectLogin()" style="
+                  background: #6366f1;
+                  color: white;
+                  border: none;
+                  padding: 14px 28px;
+                  font-size: 16px;
+                  font-weight: 600;
+                  border-radius: 12px;
+                  cursor: pointer;
+                  width: 100%;
+                  transition: all 0.3s;
+                  box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4);
+                " onmouseover="this.style.background='#4f46e5';this.style.transform='translateY(-2px)'"
+                  onmouseout="this.style.background='#6366f1';this.style.transform='translateY(0)'">
+                  Đăng nhập ngay
+                </button>
+              </div>
+            </div>
+            <style>
+              @keyframes slideUp {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+              }
+              body { margin: 0; }
+            </style>
+          `;
+          return;
+        }
+
+        // Nếu có, nạp dữ liệu vào biến toàn cục window.currentUser
+        window.currentUser = JSON.parse(userStr);
+
+        // Cập nhật giao diện sau khi đã có dữ liệu user
+        const nameEl = document.getElementById("username");
+        if (nameEl) nameEl.textContent = window.currentUser.username || "Khách";
+
+        const roleEl = document.getElementById("userRole");
+        if (roleEl)
+          roleEl.textContent =
+            "Vai trò: " + (window.currentUser.role || "").toUpperCase();
+      })();
+
+      function applyRoleUI() {
+        const user = window.currentUser;
+        if (!user) return;
+
+        if (user.role.toLowerCase() === "khach") {
+          const btnCreate = document.querySelector(".btn-create");
+          if (btnCreate) {
+            btnCreate.style.display = "block";
+            btnCreate.innerHTML = "➕ Gửi ticket mới";
+          }
+          const btnSave = document.querySelector(".btn-save");
+          if (btnSave) btnSave.style.display = "none";
+        }
+      }
+
+      function logout() {
+        const modal = document.getElementById("logoutModal");
+        if (modal) modal.classList.add("active");
+      }
+
+      function closeLogoutModal() {
+        const modal = document.getElementById("logoutModal");
+        if (modal) modal.classList.remove("active");
+      }
+
+      // Hàm xử lý log out tài khoản nhân viên it sau khi xác nhận
+      function confirmLogoutAction() {
+        // Xóa session ngay lập tức
+        //sessionStorage.removeItem("user");
+        localStorage.removeItem("user");
+
+        // Tạo overlay loading (giống hệt handleLogout)
+        const overlay = document.createElement("div");
+        overlay.style.cssText = `
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 1.3rem;
+          z-index: 999999;
+          backdrop-filter: blur(4px);
+        `;
+        overlay.innerHTML = `
+          <div style="text-align:center;">
+            <div style="
+              border: 6px solid rgba(255,255,255,0.3);
+              border-top: 6px solid white;
+              border-radius: 50%;
+              width: 50px;
+              height: 50px;
+              animation: spin 1s linear infinite;
+              margin: 0 auto 15px;
+            "></div>
+            <p>Đang đăng xuất...</p>
+          </div>
+          <style>
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          </style>
+        `;
+        document.body.appendChild(overlay);
+
+        google.script.run
+          .withSuccessHandler(function (url) {
+            // Delay ngắn để thấy overlay, rồi mới redirect
+            setTimeout(() => {
+              window.location.href = url + "?page=login";
+            }, 500);
+          })
+          .withFailureHandler(function (err) {
+            // Nếu lỗi lấy URL → xóa overlay và thông báo
+            if (overlay && overlay.parentNode) {
+              overlay.remove();
+            }
+            console.error("Lỗi lấy URL khi logout:", err);
+            alert(
+              "Đăng xuất thành công! Vui lòng tải lại trang để đăng nhập lại.",
+            );
+            location.reload();
+          })
+          .getWebAppUrl();
+      }
+
+      function handleLogout() {
+        const confirmLogout = confirm("🔒 Bạn có chắc muốn đăng xuất?");
+        if (!confirmLogout) return;
+
+        // Xóa session ngay lập tức
+        //sessionStorage.removeItem("user");
+        localStorage.removeItem("user");
+
+        // Hiển thị overlay loading ngắn (append, không thay body → giữ gesture)
+        const overlay = document.createElement("div");
+        overlay.style.cssText = `
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 1.3rem;
+          z-index: 999999;
+          backdrop-filter: blur(4px);
+        `;
+        overlay.innerHTML = `
+          <div style="text-align:center;">
+            <div style="
+              border: 6px solid rgba(255,255,255,0.3);
+              border-top: 6px solid white;
+              border-radius: 50%;
+              width: 50px;
+              height: 50px;
+              animation: spin 1s linear infinite;
+              margin: 0 auto 15px;
+            "></div>
+            <p>Đang đăng xuất...</p>
+          </div>
+          <style>
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          </style>
+        `;
+        document.body.appendChild(overlay);
+
+        google.script.run
+          .withSuccessHandler(function (url) {
+            // Redirect ngay bằng location.href (giống confirmLogoutAction thành công)
+            setTimeout(() => {
+              window.location.href = url + "?page=login";
+            }, 500); // Delay ngắn để thấy overlay, nhưng vẫn trong user gesture
+          })
+          .withFailureHandler(function () {
+            // Nếu lỗi lấy URL, xóa overlay và thông báo
+            if (overlay.parentNode) overlay.remove();
+            alert(
+              "Đăng xuất thành công! Vui lòng tải lại trang để đăng nhập lại.",
+            );
+            location.reload();
+          })
+          .getWebAppUrl();
+      }
 
       /* ===== MAP TRẠNG THÁI → CLASS ===== */
       function statusClass(status) {
-        switch (status) {
-          case "Mới":
-            return "status-new";
-          case "Đang xử lý":
+        const s = normalizeStatus(status);
+        switch (s) {
+          case "chưa xử lý":
+            return "status-pending";
+          case "chờ xử lý":
+            return "status-waiting";
+          case "đang xử lý":
             return "status-processing";
-          case "Hoàn tất":
+          case "hoàn tất":
             return "status-done";
-          case "Đóng":
-            return "status-closed";
+          case "hủy":
+            return "status-cancel";
           default:
             return "";
         }
       }
 
-      function loadTickets() {
+      // Load danh sách trạng thái cho filter
+      function loadFilterStatusOptions() {
+        const select = document.getElementById("filterStatus");
+        if (!select) return;
+
+        google.script.run
+          .withSuccessHandler(function (statusList) {
+            // Xóa option cũ, giữ lại option "Tất cả"
+            select.innerHTML = '<option value="">🎯 Tất cả trạng thái</option>';
+
+            // Thêm các trạng thái động
+            statusList.forEach((name) => {
+              const opt = document.createElement("option");
+              opt.value = name;
+              opt.textContent = name; // có thể thêm emoji nếu muốn: getEmojiForStatus(name) + " " + name
+              select.appendChild(opt);
+            });
+
+            // Nếu muốn giữ giá trị đang chọn (trường hợp reload)
+            // select.value = previousValue || "";
+          })
+          .withFailureHandler(function (err) {
+            console.error("Lỗi load trạng thái filter:", err);
+            // Fallback tĩnh nếu lỗi
+            select.innerHTML = `
+              <option value="">🎯 Tất cả trạng thái</option>
+              <option value="Chưa xử lý">🟡 Chưa xử lý</option>
+              <option value="Chờ xử lý">🟠 Chờ xử lý</option>
+              <option value="Đang xử lý">🔵 Đang xử lý</option>
+              <option value="Hoàn tất">🟢 Hoàn tất</option>
+              <option value="Hoàn tất">🟠 Hủy</option>
+            `;
+          })
+          .getAllTrangThai();
+      }
+
+      // Load danh sách loại sự cố cho filter
+      function loadFilterTypeOptions() {
+        const select = document.getElementById("filterType");
+        if (!select) return;
+
+        google.script.run
+          .withSuccessHandler(function (typeList) {
+            //console.log("Dữ liệu LoaiSuCo từ server:", typeList);
+
+            select.innerHTML = '<option value="">📂 Tất cả loại sự cố</option>';
+
+            typeList.forEach((item) => {
+              // item là object {ma: "...", ten: "..."}
+              const ma = item.ma || item.code || "";
+              const ten = item.ten || item.name || item.moTa || ma; // fallback dùng ma nếu không có ten
+
+              if (!ma) return; // bỏ qua nếu không có mã
+
+              const opt = document.createElement("option");
+              opt.value = ma; // dùng mã (HIS, BIS, ...) làm value → khớp với logic filter hiện tại
+              opt.textContent = ten; // hiển thị tên đầy đủ (nếu có) hoặc mã
+              select.appendChild(opt);
+            });
+          })
+          .withFailureHandler(function (err) {
+            console.error("Lỗi load loại sự cố: ", err);
+            // fallback tĩnh
+            select.innerHTML = `
+              <option value="">📂 Tất cả loại sự cố</option>
+              <option value="HIS">HIS</option>
+              <option value="BIS">BIS</option>
+              <option value="RIS">RIS</option>
+              <option value="LIS">LIS</option>
+            `;
+          })
+          .getAllLoaiSuCo();
+      }
+
+      // Load danh sách ticket từ server (gas)
+      function loadTickets(auto = false) {
+        const btn = document.getElementById("btnRefresh");
+        if (btn && !auto) btn.innerHTML = "⌛ Đang tải...";
+
+        if (!auto) {
+          const filterStatus = document.getElementById("filterStatus");
+          const filterType = document.getElementById("filterType");
+          const filterDate = document.getElementById("filterDate");
+          const filterTicketCode = document.getElementById("filterTicketCode");
+          const filterKhoaPhongTen =
+            document.getElementById("filterKhoaPhongTen");
+
+          if (filterStatus) filterStatus.value = "";
+          if (filterType) filterType.value = "";
+          if (filterDate) filterDate.value = "";
+
+          // Xét filterTicketCode và filterKhoaPhong có giá trị ko => Có: reset xóa dữ liệu 2 input search
+          if (filterTicketCode) filterTicketCode.value = "";
+          if (filterKhoaPhongTen) filterKhoaPhongTen.value = "";
+        }
         google.script.run
           .withSuccessHandler((res) => {
-            if (!res || res.success !== true) {
-              tickets = [];
-            } else {
-              tickets = Array.isArray(res.tickets) ? res.tickets : [];
+            if (!res || res.success !== true) return;
+
+            const newTickets = Array.isArray(res.tickets) ? res.tickets : [];
+
+            // So sánh dữ liệu cũ & mới
+            const newHash = hashTickets(newTickets);
+            if (newHash !== lastTicketHash) {
+              tickets = newTickets;
+              lastTicketHash = newHash;
+
+              updateStats();
+              renderTickets();
             }
-            updateStats();
-            renderTickets();
+
+            if (btn && !auto) btn.innerHTML = "🔄 Làm mới";
           })
           .withFailureHandler(() => {
-            alert("Backend bị lỗi, xem Execution log");
+            console.warn("Không load được ticket");
           })
           .getTickets();
       }
 
       function updateStats() {
-        statTotal.textContent = tickets.length;
-        statNew.textContent = tickets.filter(
-          (t) => t.trangThai === "Mới",
+        const totalEl = document.getElementById("statTotal");
+        const pendingEl = document.getElementById("statPending");
+        const processingEl = document.getElementById("statProcessing");
+        const doneEl = document.getElementById("statDone");
+        if (!totalEl || !pendingEl || !processingEl || !doneEl) return;
+        const total = tickets.length;
+        const countPending = tickets.filter(
+          (t) => normalizeStatus(t.trangThai) === "chưa xử lý",
         ).length;
-        statProcessing.textContent = tickets.filter(
-          (t) => t.trangThai === "Đang xử lý",
+        const countProcessing = tickets.filter(
+          (t) => normalizeStatus(t.trangThai) === "đang xử lý",
         ).length;
-        statDone.textContent = tickets.filter(
-          (t) => t.trangThai === "Hoàn tất",
+        const countDone = tickets.filter(
+          (t) => normalizeStatus(t.trangThai) === "hoàn tất",
         ).length;
+        totalEl.textContent = total;
+        pendingEl.textContent = countPending;
+        processingEl.textContent = countProcessing;
+        doneEl.textContent = countDone;
       }
 
+      // Hàm chuyển "12/03/2026 15:10" hoặc "12/03/2026" thành Date object
+      function parseVietnamDateTime(str) {
+        if (!str || typeof str !== "string") return null;
+
+        // Tách phần ngày và giờ (nếu có)
+        const parts = str.trim().split(/\s+/);
+        const dateStr = parts[0]; // "12/03/2026"
+        const timeStr = parts[1] || "00:00"; // "15:10" hoặc mặc định 00:00
+
+        const dateParts = dateStr.split("/");
+        if (dateParts.length !== 3) return null;
+
+        const day = parseInt(dateParts[0], 10);
+        const month = parseInt(dateParts[1], 10);
+        const year = parseInt(dateParts[2], 10);
+
+        const [hour, minute] = timeStr
+          .split(":")
+          .map((n) => parseInt(n, 10) || 0);
+
+        // Tạo Date object (tháng -1 vì JS đếm từ 0)
+        const dateObj = new Date(year, month - 1, day, hour, minute);
+
+        // Kiểm tra hợp lệ
+        if (isNaN(dateObj.getTime())) return null;
+
+        return dateObj;
+      }
+
+      // Render ra tất cả tickets mới được gửi lên
       function renderTickets() {
         const box = document.getElementById("tickets");
         if (!box) return;
@@ -188,33 +1849,147 @@
 
         // 1. Lấy giá trị từ các ô lọc
         const status = document.getElementById("filterStatus").value;
-        //const date = document.getElementById("filterDate").value;
-        const priority = document.getElementById("filterPriority").value;
         const type = document.getElementById("filterType").value;
+        const date = document.getElementById("filterDate").value;
+        const ticketCode = document
+          .getElementById("filterTicketCode")
+          .value.trim()
+          .toLowerCase();
+
+        const khoaPhongTen = document
+          .getElementById("filterKhoaPhongTen")
+          .value.trim()
+          .toLowerCase();
+
+        // Chuẩn hóa chuỗi tìm kiếm (loại bỏ dấu, viết thường)
+        const searchTerm = removeVietnameseTones(khoaPhongTen);
+
         // 2. Thực hiện lọc đa điều kiện
+        const user = window.currentUser;
+
         const list = tickets.filter((t) => {
           // Lọc trạng thái (nếu rỗng thì bỏ qua)
-          const matchStatus = !status || t.trangThai === status;
-
-          // Lọc mức độ ưu tiên
-          const matchPriority = !priority || t.mucDoUuTien === priority;
+          const matchStatus =
+            !status || normalizeStatus(t.trangThai) === normalizeStatus(status);
 
           // Lọc loại sự cố
           const matchType = !type || t.loaiSuCo === type;
 
-          // Lọc ngày phát sinh
-          // let matchDate = true;
-          // if (date) {
-          //   // Vì input date trả về YYYY-MM-DD, cần đảm bảo t.ngayPhatSinh có định dạng tương ứng để so sánh
-          //   // Hoặc xử lý chuỗi nếu t.ngayPhatSinh là định dạng khác (ví dụ DD/MM/YYYY)
-          //   matchDate = t.ngayPhatSinh && t.ngayPhatSinh.includes(date);
-          // }
+          const matchKhoaPhong =
+            !searchTerm ||
+            Object.keys(khoaPhongMapNoDiacritics).some((ma) => {
+              const tenNoDiacritics = khoaPhongMapNoDiacritics[ma] || "";
+              return (
+                tenNoDiacritics.includes(searchTerm) && t.maKhoaPhong === ma
+              );
+            });
 
-          // Kết hợp tất cả điều kiện (AND)
-          return matchStatus && matchPriority && matchType;
+          // Lọc ngày phát sinh
+          let matchDate = true;
+          if (date) {
+            // date là "YYYY-MM-DD" từ input type="date"
+            if (t.ngayPhatSinh && typeof t.ngayPhatSinh === "string") {
+              // Lấy chỉ phần ngày, bỏ giờ nếu có (ví dụ: "12/03/2026 11:17" → "12/03/2026")
+              const datePart = t.ngayPhatSinh.split(" ")[0].trim();
+
+              const parts = datePart.split("/");
+              if (parts.length === 3) {
+                const dd = parts[0].padStart(2, "0");
+                const mm = parts[1].padStart(2, "0");
+                const yyyy = parts[2];
+
+                // Chuyển thành YYYY-MM-DD để so sánh
+                const ticketDateISO = `${yyyy}-${mm}-${dd}`;
+
+                matchDate = ticketDateISO === date;
+              } else {
+                // Nếu định dạng lạ, thử parse bằng Date
+                const parsed = new Date(datePart);
+                if (!isNaN(parsed.getTime())) {
+                  const yyyy = parsed.getFullYear();
+                  const mm = String(parsed.getMonth() + 1).padStart(2, "0");
+                  const dd = String(parsed.getDate()).padStart(2, "0");
+                  matchDate = `${yyyy}-${mm}-${dd}` === date;
+                } else {
+                  matchDate = false; // Không parse được → không khớp
+                }
+              }
+            } else {
+              matchDate = false;
+            }
+          }
+
+          const matchCode =
+            !ticketCode ||
+            (t.maSuCo && t.maSuCo.toLowerCase().includes(ticketCode));
+
+          /* =============================
+            🔥 FIX PHÂN QUYỀN IT Ở ĐÂY
+          ============================== */
+          // Nếu có search mã → bỏ filter theo IT
+          if (ticketCode) {
+            // Nếu tìm theo mã sự cố → hiển thị tất cả (bỏ phân quyền)
+            return (
+              matchStatus &&
+              matchType &&
+              matchDate &&
+              matchCode &&
+              matchKhoaPhong
+            );
+          }
+
+          // Nếu ko search → IT chỉ thấy ticket của mình
+          if (user && user.role && user.role.toLowerCase() === "it") {
+            const isAssignedToMe =
+              t.nguoiTiepNhan === (user.fullName || user.username);
+            const isUnassigned =
+              !t.nguoiTiepNhan ||
+              t.nguoiTiepNhan.trim() === "" ||
+              t.nguoiTiepNhan === "Chưa xét" ||
+              t.nguoiTiepNhan === "Chưa gán nhân viên";
+            return (
+              matchStatus &&
+              matchType &&
+              matchDate &&
+              matchKhoaPhong &&
+              (isAssignedToMe || isUnassigned)
+            );
+          }
+          // Admin / role khác -> thấy tất cả
+          return matchStatus && matchType && matchDate && matchKhoaPhong;
         });
 
-        // 3. Hiển thị thông báo nếu không tìm thấy kết quả
+        // Đặt thứ tự ưu tiên cho ticket (1: cao nhất, 4: thấp nhất)
+        const statusPriority = {
+          "chưa xử lý": 1,
+          "chờ xử lý": 2,
+          "đang xử lý": 3,
+          "hoàn tất": 4,
+        };
+
+        list.sort((a, b) => {
+          // Lấy trạng thái từng ticket
+          const aStatus = normalizeStatus(a.trangThai);
+          const bStatus = normalizeStatus(b.trangThai);
+          // Lấy điểm thứ tự ưu tiên
+          const aPri = statusPriority[aStatus] || 99;
+          const bPri = statusPriority[bStatus] || 99;
+
+          if (aPri !== bPri) {
+            return aPri - bPri; // trạng thái khẩn hơn lên trên
+          }
+
+          // 2. Cùng trạng thái → sắp theo ngày giờ mới nhất (mới lên trên)
+          const dateA = parseVietnamDateTime(a.ngayPhatSinh);
+          const dateB = parseVietnamDateTime(b.ngayPhatSinh);
+
+          // Nếu parse thất bại → giữ nguyên thứ tự
+          if (!dateA || !dateB) return 0;
+
+          return dateB - dateA; // descending (mới nhất trước)
+        });
+
+        // Hiển thị thông báo nếu không tìm thấy kết quả
         if (list.length === 0) {
           box.innerHTML = `
             <div style="grid-column: 1/-1; text-align: center; padding: 50px; color: #999;">
@@ -241,68 +2016,562 @@
             </div>
             <div style="margin-bottom: 10px;">
               <b style="font-size: 15px; color: #2d3436;">${t.nguoiBaoSuCo}</b>
-              <span style="font-size: 12px; color: #636e72;">(${t.boPhan})</span>
+              <span style="font-size: 12px; color: #636e72;">
+                (${khoaPhongMap[t.maKhoaPhong] ? khoaPhongMap[t.maKhoaPhong] : "Không có mã khoa"} - Mã: ${t.maKhoaPhong || "Chưa có"})
+              </span>
             </div>
             <div style="margin-bottom: 10px; font-size: 14px;">
               <span style="background: #f1f2f6; padding: 2px 6px; border-radius: 4px; font-weight: bold; color: #2f3542;">${t.loaiSuCo}</span>
               <span style="color: #2f3542;">${t.moTaSuCo}</span>
             </div>
+
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; border-top: 1px solid #eee; padding-top: 10px;">
               <span class="status ${statusClass(t.trangThai)}">
                 ${t.trangThai}
               </span>
               <span style="font-size: 12px; font-weight: 600; color: #667eea;">
-                👤 ${t.nguoiTiepNhan || "Chưa gán"}
+                👤 ${t.nguoiTiepNhan || "Chưa gán nhân viên"}
               </span>
             </div>
           `;
+
           div.onclick = () => openModal(t);
           box.appendChild(div);
         });
       }
 
+      // Xử lý lấy động trạng thái
+      function loadDynamicStatusOptions(currentStatus) {
+        const select = document.getElementById("mStatus");
+        if (!select) return;
+
+        google.script.run
+          .withSuccessHandler(function (statusList) {
+            select.innerHTML = ""; // Xóa hết option cũ
+
+            statusList.forEach((name) => {
+              const opt = document.createElement("option");
+              opt.value = name;
+              opt.textContent = name;
+              select.appendChild(opt);
+            });
+
+            // Đặt giá trị hiện tại
+            if (statusList.includes(currentStatus)) {
+              select.value = currentStatus;
+            } else if (statusList.length > 0) {
+              select.value = statusList[0];
+            }
+          })
+          .withFailureHandler(function (err) {
+            console.error("Lỗi tải danh sách trạng thái:", err);
+            // Fallback về tĩnh nếu lỗi
+            select.innerHTML = `
+              <option value="Chưa xử lý">🟡 Chưa xử lý</option>
+              <option value="Chờ xử lý">🟠 Chờ xử lý</option>
+              <option value="Đang xử lý">🔵 Đang xử lý</option>
+              <option value="Hoàn tất">🟢 Hoàn tất</option>
+              <option value="Hủy">🟠 Hủy</option>
+            `;
+          })
+          .getAllTrangThai();
+      }
+
+      // Xử lý hoạt động trong modal
       function openModal(t) {
+        console.log("=== DEBUG TICKET ===");
         current = t;
+
+        const user = window.currentUser;
+        const modal = document.getElementById("modal");
+        const fileBox = document.getElementById("mFilePreview");
+
+        if (!modal) return;
+
         modal.classList.add("active");
-        mMa.value = t.maSuCo;
-        mStatus.value = t.trangThai;
-        mNguyenNhan.value = t.nguyenNhan || "";
-        mXuLy.value = t.huongXuLy || "";
-        mTime.value = t.thoiGianXuLy || "";
-        mNote.value = t.ghiChu || "";
+
+        /* ===== GÁN DỮ LIỆU CƠ BẢN ===== */
+        document.getElementById("mMa").value = t.maSuCo || "";
+        document.getElementById("mStatus").value = t.trangThai || "Chưa xử lý";
+
+        /* ===== AUTO ASSIGN IT ===== */
+        if (user && user.role && user.role.toLowerCase() === "it") {
+          // Nếu ticket chưa có người tiếp nhận
+          if (!t.nguoiTiepNhan || t.nguoiTiepNhan === "Chưa xét") {
+            document.getElementById("mAssignee").value =
+              user.fullName || user.username || "";
+          } else {
+            document.getElementById("mAssignee").value = t.nguoiTiepNhan;
+          }
+        } else {
+          document.getElementById("mAssignee").value = t.nguoiTiepNhan || "";
+        }
+
+        /* ===== XỬ LÝ THỜI GIAN ===== */
+        // === QUAN TRỌNG: Khóa động theo trạng thái ===
+        const status = normalizeStatus(t.trangThai);
+        const isCompleted = status === "hoàn tất";
+
+        // Gán giá trị thời gian
+        // document.getElementById("mStartTime").value = formatDateTimeLocal(t.thoiGianBatDau) || "";
+        // document.getElementById("mEndTime").value = formatDateTimeLocal(t.thoiGianHoanTat) || "";
+        // document.getElementById("mTotalTime").value = t.thoiGianXuLy || "";
+
+        let startValue = formatDateTimeLocal(t.thoiGianBatDau);
+        let endValue = formatDateTimeLocal(t.thoiGianHoanTat);
+
+        // Nếu ticket chưa có thời gian bắt đầu → gán mặc định hiện tại (phù hợp khi IT mới mở xử lý)
+        if (!startValue && t.ngayPhatSinh) {
+          startValue = formatDateTimeLocal(t.ngayPhatSinh);
+        }
+
+        // Chỉ set end time nếu ticket đã hoàn tất
+        if (!endValue && normalizeStatus(t.trangThai) === "hoàn tất") {
+          endValue = getNowDateTimeLocal;
+        }
+        // mStartTime.value = startValue;
+        // mEndTime.value = endValue;
+
+        document.getElementById("mStartTime").value = startValue || "";
+        document.getElementById("mEndTime").value = endValue || "";
+        document.getElementById("mTotalTime").value = t.thoiGianXuLy || "";
+
+        // Tính lại tổng thời gian ngay lập tức
+        calcTotalTime();
+
+        document.getElementById("mStartTime").readOnly = isCompleted;
+        document.getElementById("mEndTime").readOnly = isCompleted;
+        document.getElementById("mTotalTime").readOnly = true;
+
+        // Nếu đã hoàn tất → đổi màu nền để người dùng biết đã khóa
+        if (isCompleted) {
+          document.getElementById("mStartTime").style.backgroundColor =
+            "#f0f0f0";
+          document.getElementById("mEndTime").style.backgroundColor = "#f0f0f0";
+          document.getElementById("mTotalTime").style.backgroundColor =
+            "#f0f0f0";
+        } else {
+          document.getElementById("mStartTime").style.backgroundColor = "";
+          document.getElementById("mEndTime").style.backgroundColor = "";
+          document.getElementById("mTotalTime").style.backgroundColor = "";
+        }
+
+        // Tính lại tổng thời gian khi mở modal
+        calcTotalTime();
+
+        /* ===== LOAD TRẠNG THÁI ĐỘNG TỪ SHEET ===== */
+        loadDynamicStatusOptions(t.trangThai || "Chưa xử lý");
+
+        /* ===== GÁN CÁC TRƯỜNG KHÁC ===== */
+        document.getElementById("mNguyenNhan").value = t.nguyenNhan || "";
+        document.getElementById("mXuLy").value = t.huongXuLy || "";
+        document.getElementById("mNote").value = t.ghiChu || "";
+
+        // Số điện thoại (giữ nguyên logic cũ của bạn)
+        const phoneInput = document.getElementById("mPhone");
+        if (phoneInput) {
+          let phone = t.soDienThoai || t.soZalo || "";
+          phone = phone.toString().trim();
+
+          if (phone && !phone.startsWith("0") && phone.length === 9) {
+            phone = "0" + phone;
+          }
+
+          if (phone.includes("e")) {
+            phone = parseInt(phone).toString();
+          }
+          phoneInput.value = phone || "Chưa cập nhật số điện thoại";
+        }
+
+        /* ===== PHÂN QUYỀN ===== */
+        if (user && user.role && user.role.toLowerCase() === "khach") {
+          setModalReadlink(true);
+          const btnSave = document.querySelector(".btn-save");
+          if (btnSave) btnSave.style.display = "none";
+        } else {
+          setModalReadlink(false);
+          const btnSave = document.querySelector(".btn-save");
+          if (btnSave) btnSave.style.display = "block";
+        }
+
+        /* ===== FILE PREVIEW ===== */
+        fileBox.innerHTML = "";
+
+        let fileUrl = (t.file || "").toString().trim();
+
+        if (!fileUrl || fileUrl === "undefined" || fileUrl === "null") {
+          fileBox.innerHTML = "<i>Chưa có file đính kèm</i>";
+          return;
+        }
+
+        // Tạo container ảnh (giữ nguyên logic cũ của bạn)
+        const wrapper = document.createElement("div");
+        wrapper.style.display = "flex";
+        wrapper.style.flexWrap = "wrap";
+        wrapper.style.gap = "12px";
+        wrapper.style.justifyContent = "center";
+
+        const files = fileUrl.split("|");
+
+        files.forEach((url) => {
+          url = url.trim();
+          if (!url) return;
+
+          let fileId = "";
+
+          const m1 = url.match(/\/d\/([^\/]+)/);
+          const m2 = url.match(/id=([^&]+)/);
+
+          if (m1) fileId = m1[1];
+          if (m2) fileId = m2[1];
+
+          let previewUrl = url;
+
+          if (fileId) {
+            previewUrl = "https://drive.google.com/uc?export=view&id=" + fileId;
+          }
+
+          const img = document.createElement("img");
+          img.src = previewUrl;
+
+          img.style.width = "180px";
+          img.style.height = "140px";
+          img.style.objectFit = "cover";
+          img.style.borderRadius = "8px";
+          img.style.border = "1px solid #e5e7eb";
+          img.style.cursor = "pointer";
+          img.style.transition = "0.2s";
+
+          img.onmouseover = () => {
+            img.style.transform = "scale(1.05)";
+            img.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+          };
+          img.onmouseout = () => {
+            img.style.transform = "scale(1)";
+            img.style.boxShadow = "none";
+          };
+
+          img.onclick = () => {
+            window.open(previewUrl, "_top");
+          };
+
+          img.onerror = () => {
+            img.remove();
+
+            const link = document.createElement("a");
+            link.href = url;
+            link.target = "_blank";
+            link.textContent = "Xem file đính kèm";
+            link.style.display = "block";
+            link.style.margin = "6px 0";
+            link.style.color = "#4f46e5";
+            link.style.fontWeight = "500";
+
+            wrapper.appendChild(link);
+          };
+
+          wrapper.appendChild(img);
+        });
+
+        fileBox.appendChild(wrapper);
+      }
+
+      // Hàm bổ trợ để bật/tắt chế độ Read-only
+      function setModalReadlink(isReadonly) {
+        const ids = [
+          "mStatus",
+          "mNguyenNhan",
+          "mXuLy",
+          "mStartTime",
+          "mEndTime",
+          "mNote",
+        ];
+        ids.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) el.disabled = isReadonly;
+        });
       }
 
       function closeModal() {
-        modal.classList.remove("active");
+        const modal = document.getElementById("modal");
+        if (modal) {
+          modal.classList.remove("active");
+        }
+        // Reset lại trạng thái để không bị ảnh hưởng cho lần mở sau
+        current = null;
+        setModalReadlink(false);
+        const mMa = document.getElementById("mMa");
+        if (mMa) {
+          mMa.disabled = true;
+        }
       }
 
+      // Lưu thông tin ticket
       function save() {
-        if (!current) return;
+        if (!current) {
+          alert("❌ Không tìm thấy thông tin ticket!");
+          return;
+        }
+        const status = normalizeStatus(mStatus.value);
+        // Nếu trạng thái là hoàn tất → tự động lấy giờ hiện tại
+        if (status === "hoàn tất") {
+          if (!mEndTime.value) {
+            mEndTime.value = getNowDateTimeLocal();
+          }
+          // Nếu chưa có startTime → lấy từ ngày phát sinh
+          if (!mStartTime.value && current.ngayPhatSinh) {
+            mStartTime.value = formatDateTimeLocal(current.ngayPhatSinh);
+          }
+        }
+        calcTotalTime();
+
+        sendUpdate({});
+      }
+
+      function sendUpdate(extra = {}) {
+        const saveBtn = document.querySelector(".btn-save");
+        if (saveBtn) {
+          saveBtn.disabled = true;
+          saveBtn.innerHTML = "⌛ Đang lưu...";
+        }
 
         google.script.run
-          .withSuccessHandler(() => {
-            closeModal();
-            loadTickets();
+          .withSuccessHandler((result) => {
+            if (saveBtn) {
+              saveBtn.disabled = false;
+              saveBtn.innerHTML = "💾 Lưu cập nhật";
+            }
+
+            if (result && result.success) {
+              // ✅ Đóng modal TRƯỚC khi reload
+              closeModal();
+
+              // ✅ Hiển thị thông báo thành công
+              showSuccessNotification(result.message || "Cập nhật thành công!");
+
+              // ✅ Delay 500ms trước khi reload
+              setTimeout(() => {
+                loadTickets();
+              }, 500);
+            } else {
+              alert("❌ " + (result.message || "Có lỗi xảy ra!"));
+            }
+          })
+          .withFailureHandler((err) => {
+            if (saveBtn) {
+              saveBtn.disabled = false;
+              saveBtn.innerHTML = "💾 Lưu cập nhật";
+            }
+            alert("❌ Lỗi: " + err.message);
           })
           .updateTicket({
             maSuCo: current.maSuCo,
             trangThai: mStatus.value,
+            nguoiTiepNhan: mAssignee.value,
+            thoiGianBatDau: formatForSheet(mStartTime.value),
+            thoiGianHoanTat: formatForSheet(mEndTime.value),
+            thoiGianXuLy: mTotalTime.value,
             nguyenNhan: mNguyenNhan.value,
             huongXuLy: mXuLy.value,
-            thoiGianXuLy: mTime.value,
             ghiChu: mNote.value,
+            ...extra,
           });
       }
 
-      function goToCreate() {
-        google.script.run
-          .withSuccessHandler(function (url) {
-            window.top.location.href = url + "?page=create";
-          })
-          .getWebAppUrl();
+      // ✅ HÀM HIỂN THỊ THÔNG BÁO THÀNH CÔNG
+      function showSuccessNotification(message) {
+        // Tạo element thông báo
+        const notification = document.createElement("div");
+        notification.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 16px 24px;
+          border-radius: 12px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+          z-index: 10000;
+          font-weight: 600;
+          font-size: 15px;
+          animation: slideIn 0.3s ease-out;
+        `;
+        notification.innerHTML = `✅ ${message}`;
+
+        // Thêm CSS animation
+        if (!document.getElementById("notificationStyles")) {
+          const style = document.createElement("style");
+          style.id = "notificationStyles";
+          style.textContent = `
+            @keyframes slideIn {
+              from {
+                transform: translateX(400px);
+                opacity: 0;
+              }
+              to {
+                transform: translateX(0);
+                opacity: 1;
+              }
+            }
+            @keyframes slideOut {
+              from {
+                transform: translateX(0);
+                opacity: 1;
+              }
+              to {
+                transform: translateX(400px);
+                opacity: 0;
+              }
+            }
+          `;
+          document.head.appendChild(style);
+        }
+
+        document.body.appendChild(notification);
+
+        // Tự động ẩn sau 3 giây
+        setTimeout(() => {
+          notification.style.animation = "slideOut 0.3s ease-out";
+          setTimeout(() => {
+            notification.remove();
+          }, 300);
+        }, 3000);
       }
 
-      window.onload = loadTickets;
+      function calcTotalTime() {
+        const startVal = mStartTime.value;
+        const endVal = mEndTime.value;
+
+        if (!startVal || !endVal) {
+          mTotalTime.value = "";
+          return;
+        }
+
+        // Chuẩn ISO
+        const start = new Date(startVal);
+        const end = new Date(endVal);
+
+        if (isNaN(start) || isNaN(end)) {
+          mTotalTime.value = "";
+          console.warn("Invalid date:", startVal, endVal);
+          return;
+        }
+
+        // Chênh lệch phút
+        const diff = Math.round((end - start) / 60000);
+        if (diff < 0) {
+          mTotalTime.value = "Sai thời gian";
+          return;
+        }
+        mTotalTime.value = diff;
+      }
+
+      document
+        .getElementById("mStartTime")
+        .addEventListener("change", calcTotalTime);
+      document
+        .getElementById("mEndTime")
+        .addEventListener("change", calcTotalTime);
+
+      // Chuẩn hóa lại chuỗi ngày giờ => định dạng iso
+      function formatDateTimeLocal(dateStr) {
+        if (!dateStr || dateStr.trim() === "") return "";
+        // Trường hợp 1: đã là định dạng ISO (YYYY-MM-DDTHH:mm)
+        if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(dateStr)) {
+          return dateStr;
+        }
+        // Trường hợp 2: định dạng Việt Nam DD/MM/YYYY HH:mm
+        const vnPattern = /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})$/;
+        const match = dateStr.match(vnPattern);
+        if (match) {
+          const [, dd, mm, yyyy, hh, mi] = match;
+          // Đảm bảo 2 chữ số
+          return `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}T${hh.padStart(2, "0")}:${mi.padStart(2, "0")}`;
+        }
+
+        // Trường hợp 3: thử parse bằng Date (fallback)
+        const d = new Date(dateStr);
+        if (!isNaN(d.getTime())) {
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, "0");
+          const dd = String(d.getDate()).padStart(2, "0");
+          const hh = String(d.getHours()).padStart(2, "0");
+          const mi = String(d.getMinutes()).padStart(2, "0");
+          return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+        }
+        console.warn("Không parse được ngày giờ:", dateStr);
+        return "";
+      }
+
+      function formatForSheet(val) {
+        if (!val) return "";
+        // "2026-02-05T12:00" → Date
+        const d = new Date(val);
+        if (isNaN(d)) return "";
+        const dd = String(d.getDate()).padStart(2, "0");
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const yyyy = d.getFullYear();
+        const hh = String(d.getHours()).padStart(2, "0");
+        const mi = String(d.getMinutes()).padStart(2, "0");
+        // Format VN: DD/MM/YYYY HH:mm
+        return `${dd}/${mm}/${yyyy} ${hh}:${mi}`;
+      }
+
+      function hashTickets(data) {
+        return JSON.stringify(data);
+      }
+
+      // Tự động reload lại danh sách ticket sau mỗi 5 giây (nếu có ticket mới được gửi lên)
+      function startAutoReload() {
+        if (autoReloadTimer) return;
+        autoReloadTimer = setInterval(() => {
+          //console.log("⏱ Auto reload tickets...");
+          loadTickets(true);
+        }, 5000); // 5 giây
+      }
+
+      function initAdminPage() {
+        applyRoleUI();
+
+        // Load filter động trước khi load ticket
+        loadFilterStatusOptions();
+        loadFilterTypeOptions();
+
+        loadTickets();
+        loadKhoaPhongMap();
+        startAutoReload();
+
+        // Thêm event listener cho document click (đóng menu) nếu cần
+        document.addEventListener("click", function (e) {
+          const menu = document.getElementById("userDropdown");
+          const userMenuContainer = document.querySelector(".user-menu");
+          if (
+            menu &&
+            userMenuContainer &&
+            !userMenuContainer.contains(e.target)
+          ) {
+            menu.style.display = "none";
+          }
+        });
+
+        // Cập nhật lại trạng thái ticket
+        document
+          .getElementById("mStatus")
+          .addEventListener("change", function () {
+            const status = normalizeStatus(this.value);
+            const isCompleted = status === "hoàn tất";
+
+            // Nếu chọn tr thái hoàn tất => khóa textbox thời gian hoàn tất
+            if (isCompleted) {
+              mEndTime.value = getNowDateTimeLocal();
+            }
+
+            mStartTime.readOnly = isCompleted;
+            mEndTime.readOnly = isCompleted;
+
+            calcTotalTime();
+          });
+      }
     </script>
   </body>
 </html>

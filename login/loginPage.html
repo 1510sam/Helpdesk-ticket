@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base target="_top" />
+    <title>Đăng nhập hệ thống - Helpdesk ticket hospital</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #007bff; /* Xanh y tế chuẩn */
+        --secondary-color: #6c757d;
+        --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --card-bg: #ffffff;
+        --text-main: #2d3436;
+      }
+
+      body {
+        background: var(--bg-gradient);
+        min-height: 100vh;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        font-family: "Inter", sans-serif;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      .login-container {
+        background: var(--card-bg);
+        width: 100%;
+        max-width: 420px;
+        padding: 32px 28px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Vạch màu xanh trên đầu trang trí */
+      .login-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: var(--primary-color);
+      }
+
+      .header-logo {
+        font-size: 40px;
+        color: var(--primary-color);
+        margin-bottom: 10px;
+      }
+
+      h2 {
+        color: var(--text-main);
+        margin-bottom: 5px;
+        font-weight: 700;
+      }
+
+      p {
+        color: #636e72;
+        font-size: 14px;
+        margin-bottom: 30px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+        position: relative;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-main);
+      }
+
+      .input-wrapper {
+        position: relative;
+      }
+
+      .input-wrapper i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #b2bec3;
+        font-size: 14px;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 12px 12px 12px 40px;
+        border: 1.5px solid #edf2f7;
+        border-radius: 10px;
+        box-sizing: border-box;
+        font-size: 16px; /* FIX zoom iPhone */
+        transition: all 0.3s ease;
+        background-color: #f8fafc;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        background-color: #fff;
+        box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
+      }
+
+      button {
+        width: 100%;
+        padding: 14px;
+        background: var(--primary-color);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+      }
+
+      button:hover {
+        background: #0069d9;
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      .btn-quick-login {
+        width: 100%;
+        padding: 10px;
+        background: #f0f7ff;
+        border: 1px dashed #007bff;
+        color: #007bff;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-bottom: 10px;
+        transition: 0.3s;
+      }
+      .btn-quick-login:hover {
+        background: #007bff;
+        color: white;
+      }
+
+      .error {
+        background: #fff5f5;
+        color: #e53e3e;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 13px;
+        margin-top: 15px;
+        display: none;
+        border: 1px solid #feb2b2;
+      }
+
+      .guest-access {
+        margin-top: 25px;
+        text-align: center;
+      }
+
+      .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #94a3b8;
+        font-size: 0.85em;
+      }
+
+      .divider::before,
+      .divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .divider span {
+        padding: 0 10px;
+      }
+
+      .btn-guest {
+        width: 100%;
+        padding: 12px;
+        background-color: transparent;
+        border: 2px solid #2563eb;
+        color: #2563eb;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+      }
+
+      .btn-guest:hover {
+        background-color: #eff6ff;
+        transform: translateY(-1px);
+      }
+
+      .btn-guest i {
+        font-size: 1.1em;
+      }
+
+      .footer {
+        margin-top: 25px;
+        font-size: 12px;
+        color: #b2bec3;
+      }
+
+      /* Hiệu ứng loading khi bấm nút */
+      .loading {
+        opacity: 0.7;
+        pointer-events: none;
+      }
+
+      /* ===== MOBILE RESPONSIVE ===== */
+      @media (max-height: 600px) {
+        body {
+          align-items: flex-start;
+          padding-top: 30px;
+          padding-bottom: 30px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .login-container {
+          padding: 26px 20px;
+          border-radius: 16px;
+        }
+        .header-logo {
+          font-size: 34px;
+        }
+        h2 {
+          font-size: 22px;
+        }
+        p {
+          font-size: 13px;
+          margin-bottom: 22px;
+        }
+        .form-group {
+          margin-bottom: 16px;
+        }
+        .form-group label {
+          font-size: 12px;
+        }
+        .input-wrapper {
+          display: flex;
+          align-items: center;
+        }
+        .input-wrapper i {
+          color: var(--primary-color);
+          opacity: 0.8;
+          position: absolute;
+          left: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 14px;
+        }
+        .input-wrapper select,
+        .input-wrapper input {
+          height: 44px;
+          line-height: 44px;
+          padding-top: 0;
+          padding-bottom: 0;
+        }
+        button {
+          padding: 12px;
+          font-size: 15px;
+        }
+        .btn-guest {
+          padding: 11px;
+          font-size: 14px;
+        }
+        .footer {
+          font-size: 11px;
+          margin-top: 18px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="login-container">
+      <div class="header-logo">
+        <i class="fas fa-hospital-user"></i>
+      </div>
+      <h2>Hệ thống Helpdesk</h2>
+      <p>Phòng CNTT - Bệnh viện Thủ Đức</p>
+
+      <form id="loginForm" onsubmit="login(event)">
+        <div class="form-group" id="userGroup">
+          <label id="lblUsername">Tài khoản</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user"></i>
+            <input
+              type="text"
+              id="username"
+              placeholder="Nhập username nhân viên..."
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-group" id="phoneGroup" style="display: none">
+          <label>Số điện thoại của bạn</label>
+          <div class="input-wrapper">
+            <i class="fas fa-phone"></i>
+            <input type="text" id="phone" placeholder="Nhập số điện thoại..." />
+          </div>
+        </div>
+
+        <div class="form-group" id="passGroup">
+          <label>Mật khẩu</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock"></i>
+            <input
+              type="password"
+              id="password"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-group" id="roleGroup">
+          <label>Vai trò hệ thống</label>
+          <div class="input-wrapper">
+            <i class="fas fa-shield-halved"></i>
+            <select id="role" required>
+              <option value="" disabled selected>Chọn vai trò...</option>
+              <option value="it">Kỹ thuật viên IT</option>
+              <!-- <option value="admin">Quản trị viên</option> -->
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" id="btnLogin">
+          <span>Đăng nhập</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+
+        <div id="error" class="error">
+          <i class="fas fa-circle-exclamation"></i> <span id="errorText"></span>
+        </div>
+      </form>
+
+      <div class="guest-access">
+        <div class="divider">
+          <span>HOẶC</span>
+        </div>
+        <button
+          type="button"
+          onclick="toggleQuickLogin()"
+          class="btn-quick-login"
+          id="btnToggleLogin"
+        >
+          <i class="fas fa-bolt"></i> Đăng nhập nhanh (NV Bệnh viện)
+        </button>
+        <button type="button" onclick="goToCreate()" class="btn-guest">
+          <i class="fas fa-paper-plane"></i>
+          Gửi ticket hỗ trợ
+        </button>
+      </div>
+
+      <div class="footer">&copy; 2026 IT Department. All rights reserved.</div>
+    </div>
+
+    <script>
+      let isQuickLoginMode = false;
+
+      function toggleQuickLogin() {
+        isQuickLoginMode = !isQuickLoginMode;
+
+        const phoneGroup = document.getElementById("phoneGroup");
+        const passGroup = document.getElementById("passGroup");
+        const roleGroup = document.getElementById("roleGroup");
+
+        const passwordInput = document.getElementById("password");
+        const roleSelect = document.getElementById("role");
+
+        const btnToggle = document.getElementById("btnToggleLogin");
+
+        if (isQuickLoginMode) {
+          // ===== MODE NV BỆNH VIỆN =====
+          phoneGroup.style.display = "block";
+
+          // Ẩn password + role
+          passGroup.style.display = "none";
+          roleGroup.style.display = "none";
+
+          // Bỏ required
+          passwordInput.removeAttribute("required");
+          roleSelect.removeAttribute("required");
+
+          // Password
+          passwordInput.value = "QUICK_LOGIN_NVBV";
+
+          btnToggle.innerHTML = `
+            <i class="fas fa-arrow-left"></i> Quay lại đăng nhập đầy đủ
+          `;
+        } else {
+          // ===== MODE IT / ADMIN =====
+
+          // Ẩn SĐT
+          phoneGroup.style.display = "none";
+
+          // Hiện password + role
+          passGroup.style.display = "block";
+          roleGroup.style.display = "block";
+
+          // Gắn lại required
+          passwordInput.setAttribute("required", "true");
+          roleSelect.setAttribute("required", "true");
+
+          // Reset password
+          passwordInput.value = "";
+
+          btnToggle.innerHTML = `
+            <i class="fas fa-bolt"></i> Đăng nhập nhanh (NV Bệnh viện)
+          `;
+        }
+      }
+
+      // Login dành cho kỹ thuật viên it / admin
+      function login(e) {
+        e.preventDefault();
+        const btn = document.getElementById("btnLogin");
+        const errBox = document.getElementById("error");
+        const userInput = document.getElementById("username").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const pass = isQuickLoginMode
+          ? "QUICK_LOGIN_NVBV"
+          : document.getElementById("password").value.trim();
+        const roleValue = isQuickLoginMode
+          ? "khach"
+          : document.getElementById("role").value;
+
+        btn.innerHTML =
+          '<i class="fas fa-spinner fa-spin"></i> Đang xác thực...';
+        btn.disabled = true;
+        errBox.style.display = "none";
+
+        google.script.run
+          .withSuccessHandler(function (res) {
+            if (!res || !res.success) {
+              showError(res.message || "Đăng nhập thất bại");
+              resetBtn();
+              return;
+            }
+
+            // Lưu user vào sessionStorage
+            //sessionStorage.setItem("user", JSON.stringify(res.user));
+            localStorage.setItem("user", JSON.stringify(res.user));
+
+            // Load nội dung trang động
+            google.script.run
+              .withSuccessHandler(function (htmlContent) {
+                // Thay toàn bộ body bằng nội dung mới từ template
+                document.body.style.overflow = "auto"; // Cho phép scroll nếu cần
+                document.body.style.height = "auto";
+
+                document.body.innerHTML = htmlContent;
+
+                // Chạy lại tất cả script trong nội dung mới
+                const scripts = document.body.querySelectorAll("script");
+                scripts.forEach((oldScript) => {
+                  if (oldScript.textContent) {
+                    const newScript = document.createElement("script");
+                    newScript.textContent = oldScript.textContent;
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                  }
+                });
+
+                // Gọi hàm init nếu tồn tại (đã thêm trong template)
+                //const user = JSON.parse(sessionStorage.getItem("user") || "{}");
+                const user = JSON.parse(localStorage.getItem("user") || "{}");
+                if (
+                  res.targetPage === "create" &&
+                  typeof initCreatePage === "function"
+                ) {
+                  initCreatePage(); // Gọi init cho trang create → sẽ chạy checkITButton()
+                } else if (
+                  (res.targetPage === "admin" || res.targetPage === "qtv") &&
+                  typeof initAdminPage === "function"
+                ) {
+                  initAdminPage();
+                } else {
+                  console.warn(
+                    "Không tìm thấy hàm init cho trang " + res.targetPage,
+                  );
+                }
+              })
+              .withFailureHandler(function (err) {
+                document.body.innerHTML = `
+                  <div style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    background: #f8d7da;
+                    color: #721c24;
+                    font-family: 'Inter', sans-serif;
+                    text-align: center;
+                    padding: 20px;
+                  ">
+                    <div>
+                      <i class="fas fa-exclamation-triangle fa-4x" style="margin-bottom: 20px;"></i>
+                      <h3>Lỗi tải trang</h3>
+                      <p>${err.message || "Không xác định"}</p>
+                      <button onclick="location.reload()" style="
+                        margin-top: 20px;
+                        padding: 12px 24px;
+                        background: #dc3545;
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        cursor: pointer;
+                      ">Thử lại</button>
+                    </div>
+                  </div>
+                `;
+                console.error(err);
+              })
+              .getPageContent(res.targetPage, JSON.stringify(res.user));
+          })
+          .withFailureHandler(function (err) {
+            showError("Lỗi hệ thống: " + (err.message || "Không xác định"));
+            resetBtn();
+          })
+          .checkLogin(userInput, pass, roleValue, phone);
+      }
+
+      function showError(msg) {
+        const errBox = document.getElementById("error");
+        const errText = document.getElementById("errorText");
+        errText.innerText = msg;
+        errBox.style.display = "block";
+        document.getElementById("password").focus();
+        document.getElementById("password").select();
+      }
+
+      function resetBtn() {
+        const btn = document.getElementById("btnLogin");
+        btn.classList.remove("loading");
+        btn.disabled = false;
+        btn.innerHTML =
+          '<span>Đăng nhập</span> <i class="fas fa-arrow-right"></i>';
+      }
+
+      // ==================== FIX REDIRECT TRẮNG TRANG ====================
+      // Biến cache URL (lấy 1 lần khi trang load)
+      let cachedWebAppUrl = null;
+
+      // Preload URL ngay khi trang đăng nhập load
+      window.addEventListener("load", function () {
+        google.script.run
+          .withSuccessHandler(function (url) {
+            cachedWebAppUrl = url;
+            //console.log("✅ Đã cache WebApp URL:", url);
+          })
+          .withFailureHandler(function (err) {
+            console.error("Không lấy được URL:", err);
+          })
+          .getWebAppUrl();
+      });
+
+      // Hàm goToCreate chuyển hướng tới trang gửi ticket
+      function goToCreate() {
+        const btn = document.querySelector(".btn-guest");
+        if (btn) btn.disabled = true; // tránh click nhiều lần
+        if (cachedWebAppUrl) {
+          window.location.href = cachedWebAppUrl + "?page=create";
+        } else {
+          google.script.run
+            .withSuccessHandler(function (url) {
+              // Redirect ngay lập tức trong cùng tab (giống confirmLogoutAction thành công)
+              window.location.href = url + "?page=create";
+            })
+            .withFailureHandler(function (err) {
+              console.error("Lỗi lấy URL:", err);
+              alert("Không thể chuyển đến trang gửi ticket. Vui lòng thử lại!");
+            })
+            .getWebAppUrl();
+        }
+      }
+
+      // function showContinueButton(url) {
+      //   const container = document.querySelector(".login-container");
+      //   container.innerHTML = `
+      //     <div style="text-align:center">
+      //       <h2>✅ Đăng nhập thành công</h2>
+      //       <p>Vui lòng bấm nút bên dưới để tiếp tục</p>
+      //       <button
+      //         style="
+      //           padding:12px 25px;
+      //           background:#1976d2;
+      //           color:white;
+      //           border:none;
+      //           border-radius:6px;
+      //           cursor:pointer;
+      //           font-size:16px;
+      //         "
+      //         onclick="window.open('${url}', '_top')"
+      //       >
+      //         🚀 Tiếp tục vào hệ thống
+      //       </button>
+      //     </div>
+      //   `;
+      // }
+
+      function showContinueButton(url) {
+        window.open(url, "_top");
+      }
+    </script>
+  </body>
+</html>
